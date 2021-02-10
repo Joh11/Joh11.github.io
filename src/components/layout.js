@@ -9,7 +9,7 @@ import Footer from "./footer"
 export default function Layout({ children }) {
     return <>
 	       <Helmet>
-		   <title>Johan FÉLISAZ</title>
+		   <title>Johan Félisaz</title>
 	       </Helmet>
 	       <Header/>
 	       { children }

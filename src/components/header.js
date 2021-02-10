@@ -24,7 +24,7 @@ function MenuLink({ to, children }) {
 
 export default function Header() {
     return <header>
-	       <h1>Johan FÉLISAZ</h1>
+	       <h1>Johan Félisaz</h1>
 	       <nav>
 		   <ul style={{ display: "flex",
 			        "justify-content": "space-around"}}>

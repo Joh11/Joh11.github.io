@@ -1,6 +1,41 @@
 import * as React from "react"
+import { useStaticQuery, graphql } from "gatsby"
+import { Link } from "gatsby"
 
 import Layout from "../components/layout"
+
+function NoteLink({ to, children }) {
+    console.log(to)
+    return <li>
+	       <Link to={to}>
+		   {children}
+	       </Link>
+	   </li>
+}
+
+function AllNotes()
+{
+    const data = useStaticQuery(graphql`
+{
+  allOrgContent {
+    nodes {
+      id
+      metadata {
+        title
+      }
+      slug
+    }
+  }
+}
+`)
+    return <ul>
+	       {data.allOrgContent.nodes.map((node, index) =>
+		   <NoteLink to={node.slug}>
+		       {node.metadata.title}
+		   </NoteLink>
+	       )}
+	   </ul>
+}
 
 export default function Notes() {
     return (
@@ -18,10 +53,11 @@ export default function Notes() {
 		targeting a LateX export. The specific setup file used for the
 		export can be found in
 		my <a href="https://github.com/Joh11/.emacs.d/blob/master/templates/feynman.org">
-		       Emacs dotfiles</a>. 
+		   Emacs dotfiles</a>. 
 	    </p>
 
 	    <h4>All notes</h4>
+	    <AllNotes/>
 	</Layout>
     )
 }
