@@ -2,8 +2,7 @@ import * as React from "react"
 
 import Layout from "../components/layout"
 
-// markup
-export default function IndexPage() {
+export default function Index() {
     return (
 	<Layout>
 	</Layout>

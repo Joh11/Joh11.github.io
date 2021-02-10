@@ -30,6 +30,7 @@ export default function Header() {
 			        "justify-content": "space-around"}}>
 		       <MenuLink to="/">Home</MenuLink>
 		       <MenuLink to="/projects">Projects</MenuLink>
+		       <MenuLink to="/notes">Notes</MenuLink>
 		       <GPGMenuLink/>
 		       <MenuLink to="/about">About</MenuLink>
 		   </ul>
