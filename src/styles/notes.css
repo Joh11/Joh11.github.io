@@ -1,0 +1,10 @@
+.section h2 {
+    font-size: 1.999rem;
+}
+
+.section h3, h4, h5 {
+    font-size: 1.414rem;
+    border: none;
+    padding: none;
+    margin: none;
+}
