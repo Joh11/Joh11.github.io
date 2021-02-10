@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[7],{"16l3":function(n,e,t){"use strict";t.r(e),t.d(e,"default",(function(){return c}));var r=t("q1tI"),u=t("Bl7J");function c(){return r.createElement(u.a,null,r.createElement("h3",null,"My projects"))}}}]);
+//# sourceMappingURL=component---src-pages-projects-js-80f2ff531d4a361da620.js.map
