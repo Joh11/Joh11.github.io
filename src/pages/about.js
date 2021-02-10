@@ -1,10 +1,11 @@
 import * as React from "react"
+import { Link } from "gatsby"
+
+import Layout from "../components/layout";
 
 export default function About() {
     return (
-	<>
-	    <h1>This is a header.</h1>
-	    <p>Au revoir !</p>
-	</>
+	<Layout>
+	</Layout>
     );
 }
