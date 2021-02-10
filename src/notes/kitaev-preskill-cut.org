@@ -114,9 +114,9 @@ B, C and D is deformed. Because the ground state is a bipartite pure
 state, entropies of both subsystems are equal. That is, \(S_{ABC} =
 S_{D}\) and \(S_{BC} = S_{AD}\). Thus the change in entropy can be expressed as
 \begin{equation*}
-  \Delta S_{topo} = (\Delta S_B - \Delta S_{AB})
-  + (\Delta S_C - \Delta S_{AC})
-  + (\Delta S_D - \Delta S_{AD})
+  \Delta S_{topo} = (\Delta S_B - \Delta S_{AB}) +
+  (\Delta S_C - \Delta S_{AC}) +
+  (\Delta S_D - \Delta S_{AD})
 \end{equation*}
 Using the same argument as before, the three terms vanishes.
 
