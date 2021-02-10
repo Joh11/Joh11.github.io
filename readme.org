@@ -1,6 +1,18 @@
 * TODO To implement next
 ** Notes
-*** LateX formulas
+*** Latex shortcuts
+*** tikz figures
 *** =notes/= in the slug of the notes
 *** Italics in notes
 *** Abstract
+
+
+* Things to put
+** contact information
+*** email (hidden from bots)
+*** linkedin
+*** github
+** projects
+*** 
+** skills
+*** 
