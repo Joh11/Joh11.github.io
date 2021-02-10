@@ -13,6 +13,14 @@ export default function Notes() {
 		computer, I thought it could be interesting to share them to others. 
 	    </p>
 
+	    <p>
+		They have been typed in the org-mode format, specifically
+		targeting a LateX export. The specific setup file used for the
+		export can be found in
+		my <a href="https://github.com/Joh11/.emacs.d/blob/master/templates/feynman.org">
+		       Emacs dotfiles</a>. 
+	    </p>
+
 	    <h4>All notes</h4>
 	</Layout>
     )
