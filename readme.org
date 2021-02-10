@@ -1,0 +1,6 @@
+* TODO To implement next
+** Notes
+*** LateX formulas
+*** =notes/= in the slug of the notes
+*** Italics in notes
+*** Abstract
