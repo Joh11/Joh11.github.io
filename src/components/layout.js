@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Helmet } from "react-helmet"
 
 import "../styles/global.css"
 
@@ -7,6 +8,9 @@ import Footer from "./footer"
 
 export default function Layout({ children }) {
     return <>
+	       <Helmet>
+		   <title>Johan FÉLISAZ</title>
+	       </Helmet>
 	       <Header/>
 	       { children }
 	       <Footer/>
