@@ -1,8 +1,6 @@
 import * as React from "react"
 import { Link } from "gatsby"
 
-// import gpg from "../misc/jfelisaz.gpg"
-
 function OuterMenuLink({ children }) {
     return <li style={{ "list-style-type": "none",
 		      }}>
@@ -12,7 +10,7 @@ function OuterMenuLink({ children }) {
 
 function GPGMenuLink() {
     return <OuterMenuLink>
-	       <a href="/jfelisaz.gpg">GPG</a>
+	       <Link href="/jfelisaz.gpg">GPG</Link>
 	   </OuterMenuLink>
 }
 

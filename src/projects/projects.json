@@ -2,11 +2,27 @@
     "projects": [
 	{
 	    "title": "Monte-Carlo simulation of the 3D Heisenberg model",
-	    "url": "https://github.com/Joh11/monte-carlo"
+	    "url": "https://github.com/Joh11/monte-carlo",
+	    "tags": ["physics", "c++"],
+	    "description": [
+		"A project for the course \"Computer Simulation of Physical Systems\" at EPFL.",
+		"It is a C++ program that uses the single-spin update Metropolis-Hastings algorithm (Monte-Carlo Markov Chains) to sample from the distribution of states of a (classical) spins system at a given temperature. "
+	    ]
 	},
 	{
 	    "title": "Luttinger-Tisza method for 2D lattices",
-	    "url": "https://github.com/Joh11/"
+	    "url": "https://github.com/Joh11/luttinger-tisza/",
+	    "tags": ["physics", "python", "julia"]
+	},
+	{
+	    "title": "Semiclassical Monte-Carlo simulation for 2D lattices",
+	    "tags": ["physics", "julia"]
+	},
+	{
+	    "title": "Backend for Vici (Lauzhack 2020)",
+	    "url": "https://github.com/Joh11/vici_backend",
+	    "tags": ["python", "django"]
+	    
 	}
     ]
 }
