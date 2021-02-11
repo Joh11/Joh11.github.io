@@ -4,8 +4,8 @@
 *** =notes/= in the slug of the notes
 *** Italics in notes
 *** Abstract
-
-
+** Other
+*** make sure every main title uses h2, not h3
 * Things to put
 ** contact information
 *** email (hidden from bots)
