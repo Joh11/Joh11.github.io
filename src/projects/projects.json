@@ -1,0 +1,12 @@
+{
+    "projects": [
+	{
+	    "title": "Monte-Carlo simulation of the 3D Heisenberg model",
+	    "url": "https://github.com/Joh11/monte-carlo"
+	},
+	{
+	    "title": "Luttinger-Tisza method for 2D lattices",
+	    "url": "https://github.com/Joh11/"
+	}
+    ]
+}
