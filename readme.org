@@ -1,6 +1,5 @@
 * TODO To implement next
 ** Notes
-*** Latex shortcuts
 *** tikz figures
 *** =notes/= in the slug of the notes
 *** Italics in notes

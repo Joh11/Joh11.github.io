@@ -8,3 +8,8 @@
     padding: none;
     margin: none;
 }
+
+/* to avoid adding a global scroll on mobile */
+mjx-container {
+    overflow-x: auto;
+}
