@@ -13,6 +13,8 @@
 *** linkedin
 *** github
 ** projects
-*** 
+*** monte carlo
+*** luttinger tisza
+*** vici
 ** skills
 *** 
