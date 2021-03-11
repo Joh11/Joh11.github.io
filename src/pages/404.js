@@ -7,6 +7,5 @@ export default function NotFoundPage() {
     return <Layout>
 	       <h2>404</h2>
 	       <p>We could not find what you were looking for. </p>
-	       <Link to="/">Go home</Link>
 	   </Layout>
 }

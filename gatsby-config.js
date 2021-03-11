@@ -12,5 +12,8 @@ module.exports = {
 		  }
 	      },
 	      `gatsby-transformer-remark`,
-	      `gatsby-transformer-orga`],
+	      `gatsby-transformer-orga`,
+	      `gatsby-plugin-image`,
+	      `gatsby-plugin-sharp`,
+	      `gatsby-transformer-sharp`],
 };

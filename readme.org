@@ -6,6 +6,9 @@
 *** Abstract
 ** Other
 *** make sure every main title uses h2, not h3
+*** contact links
+*** better footer
+
 * Things to put
 ** contact information
 *** email (hidden from bots)
