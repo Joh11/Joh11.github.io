@@ -1,1 +1,10 @@
 #+title: Notes
+
+The following notes were primarly used to learn a specific topic,
+using the Feynman technique: learning a subject by explaining it to
+someone else. As I had them lying around in my computer, I thought it
+could be interesting to share them to others.
+
+* All notes
+- [[file:kitaev-preskill-cut.org][Kitaev-Preskill cut]]
+- [[file:semiclassical-monte-carlo.org][Semiclassical Monte-Carlo]]

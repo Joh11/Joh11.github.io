@@ -1,0 +1,166 @@
+#+setupfile: "~/.emacs.d/templates/feynman.org"
+
+
+#+title: The Kitaev-Preskill cut
+
+* Context
+The results of this article holds for a specific class of quantum
+systems: *topologically ordered* two-dimensional media with a *mass gap*.
+
+** Mass gap
+The setup is analogous to the harmonic crystal operator
+ladder. Instead of seeing the quantum system as an Hamiltonian acting
+on a lattice with a simpler system at each site (i.e. spin
+\(\frac12\)), one can see the ground state of the system like the
+vacuum state. This vacuum can be populated by (quasi)particles. Each
+particle can either put the system in an excited state (higher
+eigenenergy), in a less excited state (if it was acting on an excited
+state ; on the vacuum it just yields zero), or leave it in a different
+state of same energy. If there is a gap in the energy spectrum of the
+system between the ground state manifold and the first excited state,
+then this is a mass gap. This means that the quasiparticles have a
+mass (the jump in energy cannot be arbitrarily small yet nonzero).
+
+** Topological order
+The order of the system is topologically protected. This means that
+any weak perturbation cannot destroy the mass gap, or change the order
+of the system to another order, even if it could be possible to have
+it in the first place.
+
+* Main result of the paper
+\begin{equation*}
+S_{\text{topo}} = - \log(D)
+\end{equation*}
+with \(D\) the /total quantum dimension/ of the medium:
+\begin{equation*}
+D = \sqrt{\sum_a d^2_a}
+\end{equation*}
+
+* Prerequisites
+
+** The von Neumann entropy
+It is defined for a specific region, that is a (usually connected)
+subset of the sites. Let's assume \(\rho_{\text{total}}\) is the
+density matrix of the whole system. It is trivial as this is a pure
+state. However, by tracing out all of the sites outside of the region
+of interest, \(\rho\) is no longer a pure state density matrix. The
+*von Neumann entropy* is defined as followed:
+\begin{equation*}
+S(\rho) = \Tr\rho \log \rho
+\end{equation*}
+
+A few remarks:
+- The logarithm is defined by diagonalizing the operator and taking
+  the logarihm of the eigenvalues.
+- It is likely that the density operator has zero eigenvalues. We
+  choose the convention \(0\log 0 = 0\) to avoid singularities.
+
+* Main text
+** Definition of the topological entanglement entropy
+Let's assume we are interested in the von Neumann entropy of a given
+region of boundary length \(L\), large compared to the correlation
+length. It follows the following infinite size expansion:
+\begin{equation*}
+S = \alpha L - \gamma + \ldots
+\end{equation*}
+
+\(\alpha\) is not universal, and depends on the hamiltonian and
+geometry of the system. However, as we'll show soon, \(-\gamma\) is
+universal and topological. It is called the *topological entanglement
+entropy*.  In practise, this expansion is complicated to use to
+compute the entropy. It is easier to use another expression for
+it. Consider the following system, composed of four regions A, B, C
+and D:
+
+#+begin_export latex
+\begin{figure}[htp]
+  \centering
+  \begin{tikzpicture}
+    \draw (0, 0) circle(1);
+    
+    \draw (0, 0) -- (0, 1);
+    \draw[rotate=-120] (0, 0) -- (0, 1);
+    \draw[rotate=120] (0, 0) -- (0, 1);
+
+    \draw (-1.5, -1.1) rectangle (1.5, 1.1);
+    
+    \node at (-0.45, 0.4) {A};
+    \node at (0.45, 0.4) {B};
+    \node at (0, -0.5) {C};
+    \node at (-1.2, 0.8) {D};
+  \end{tikzpicture}
+\end{figure}
+#+end_export
+
+The topological entanglement entropy is defined as such:
+\begin{equation*}
+S_{topo} = S_A + S_B + S_C - S_{AB} - S_{BC} - S_{AC} + S_{ABC},
+\end{equation*}
+where \(AB = A \cup B\) and so on.
+
+** Proof that \(S_{topo}\) is topological invariant
+Let's assume that the boundary between C and D is slightly
+deformed. The change in entropy can be written as follow:
+\begin{equation*}
+\Delta S_{topo} = (\Delta S_{ABC} - \Delta S_{BC}) - (\Delta S_{AC} - \Delta S_C)
+\end{equation*}
+As the regions are large compared to the correlation length, appending
+the region A to BC have little effect on the /change/ of entropy. Thus
+the first term on the right hand side vanishes. Similarly, the second
+one does too, and the entropy remains unchanged.
+
+Now, let's see what happens when a triple point, like the one between
+B, C and D is deformed. Because the ground state is a bipartite pure
+state, entropies of both subsystems are equal. That is, \(S_{ABC} =
+S_{D}\) and \(S_{BC} = S_{AD}\). Thus the change in entropy can be expressed as
+\begin{equation*}
+  \Delta S_{topo} = (\Delta S_B - \Delta S_{AB}) +
+  (\Delta S_C - \Delta S_{AC}) +
+  (\Delta S_D - \Delta S_{AD})
+\end{equation*}
+Using the same argument as before, the three terms vanishes.
+
+** Proof that \(S_{topo}\) is universal
+A *universal quantity* does not change when the hamiltonian is
+smoothly deformed. Let's assume that the hamiltonian is a sum of local
+terms, and that the correlation length stays small compared to the
+regions defined along the deformation. Two cases here:
+- If the changes are far away from a given region, its entropy is not
+  affected.
+- If the changes are close to a region, using the topological
+  invariance, we are free to move back the boundaries until it's far
+  enough to neglect the effect of the deformation. After the
+  hamitonian changes, the boundaries can be put back were they were.
+  
+** A more topological formulation of \(S_{topo}\)
+It helps to glue the medium with its time-reversal conjugate at
+spatial infinity. It can now be seen as a sphere with 4 holes. We can
+now exploit the composition property of the entropy. On one side, both
+the medium and its conjugate carry an entropy \(S_{topo}\). On the
+other hand, the usual formula for the entropy, and the fact that the
+entropy depends only on the topology (number of punctures) of each
+region:
+\begin{equation*}
+  2S_{topo} = S_A + S_B + S_C - S_{AB} - S_{BC} - S_{AC}
+  = 3S_4 - 4S_3,
+\end{equation*}
+where \(S_3\) and \(S_4\) are the entropies of a sphere with 3 or 4
+punctures.
+
+** Computing \(S_{topo}\) using TQFT methods
+*** Standard proof
+*** Simpler proof using CFT
+
+* Questions
+- why does equation 1 hold ?
+- what is a superselection sector ?
+- what is an abelian anyon ?
+- what is a \(SU(2)_k\) Chern-Simons theory ?
+- why ambiguity between terms that scales with \(L\) and constant ones
+  ?
+- what is a mass gap ?
+- chirality in this context ?
+- topological S-matrix ?
+- what's a Wilson loop ?
+- what's a conformal field theory ?
+- modular transformation ?

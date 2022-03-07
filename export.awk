@@ -6,6 +6,7 @@
 
 # To Do:
 # - emphasis
+# - lists (unordered)
 
 function footer() {
     print "<footer>"
@@ -42,16 +43,18 @@ BEGIN {
     print "<title>Johan Félisaz</title>"
     css("global.css")
     css("custom.css")
-    # print "<script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>"
-    # print "<script id=\"MathJax-script\" async src=\"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js\"></script>"
+    print "<script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>"
+    print "<script id=\"MathJax-script\" async src=\"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js\"></script>"
     print "</head>"    
     print "<body>"
     navbar()
 
     close_par = 0; # set if a paragraph must be closed with </p>
+    close_list = 0; # set if we are currently in a list
 }
 
 END {
+    if (close_list) { print "</ul>"; close_par = 0; }
     if (close_par) print "</p>";
     
     footer()
@@ -61,9 +64,23 @@ END {
 
 # to_process is a boolean to make sure that lines that are processed
 # in a special way (i.e. headlines) are not exported twice
-{ to_process = 1; }
+{ to_process = 1 }
+
+/^- / {
+    if(!close_list) {
+	close_list = 1;
+	print "<ul>";
+    }
+
+    print "<li>"
+    $0 = substr($0, 3)
+}
 
 /^$/ {
+    if (close_list) {
+	print "</ul>"
+	close_list = 0
+    }
     if (close_par) print "</p>";
     print "<p>";
     close_par = 1;
@@ -99,9 +116,11 @@ function process_url(url) {
     link_end = match($0, /\]\]/);
     url = process_url(substr($0, link_start + 2, link_sep - link_start - 2));
     desc = substr($0, link_sep + 2, link_end - link_sep - 2);
-    printf("%s<a href=\"%s\">%s</a>%s", "", url, desc, "");
+    printf("%s<a href=\"%s\">%s</a>%s", substr($0, 1, link_start - 1), url, desc, "");
     
     to_process = 0;
 }
 
 to_process { print }
+
+close_list { print "</li>" }

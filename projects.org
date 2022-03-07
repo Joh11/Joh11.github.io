@@ -1,1 +1,36 @@
 #+title: Projects
+
+** Semiclassical Monte-Carlo simulation for 2D lattices
+[[https://github.com/Joh11/semiclassical-monte-carlo][Github repository]]
+
+An optimized Julia package to implement the semiclassical Monte-Carlo
+method for 2D lattices. The main goal of this package is to plot the
+dynamical structure factor of a system at a given temperature.
+
+** Luttinger-Tisza method for 2D lattices
+[[https://github.com/Joh11/luttinger-tisza][Github repository]]
+
+A collection of scripts to visualize the magnetic order of a given 2D
+lattice system, under the Luttinger Tisza approximation.
+
+** Monte-Carlo simulation of the 3D Heisenberg model
+[[https://github.com/Joh11/monte-carlo][Github repository]]
+
+A project for the course "Computer Simulation of Physical Systems" at EPFL.
+
+It is a C++ program that uses the single-spin update
+Metropolis-Hastings algorithm (Monte-Carlo Markov Chains) to sample
+from the distribution of states of a (classical) spins system at a
+given temperature.
+
+** Backend for Vici (Lauzhack hackathon 2020)
+[[https://github.com/Joh11/vici_backend][Github repository]]
+
+A Django based backend for our submission to the Lauzhack
+hackathon. The project was a platform to make contact between the
+customers and local producers and shops, highly impacted by the Covid
+crisis and the consequent lockdowns. It featured an iOS app, along
+with a map that would suggest stores nearby. This backend took care of
+registering new users (customers and shops), storing prices,
+description and pictures of items sold by the vendors, and the
+geospatial queries.

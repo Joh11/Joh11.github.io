@@ -1,0 +1,120 @@
+#+setupfile: "~/.emacs.d/templates/feynman.org"
+
+#+title: The semiclassical Monte-Carlo method
+
+#+begin_abstract
+This is an overview of the semiclassical Monte-Carlo (SC-MC) method,
+as used in the paper [[https://arxiv.org/abs/1403.7903]["Semi-classical spin dynamics of the
+antiferromagnetic Heisenberg model on the kagome lattice"]]. It uses the
+method on a Kagome lattice, but it can be applied to any lattice. It
+relies on the Heisenberg model, that is the \(S \rightarrow \infty\)
+limit, with quantum spins replaced by unit vectors in
+\(\R^3\).
+#+end_abstract
+
+* Goal
+This is used to compute the *dynamical structure factor*, also called
+*scattering function*:
+
+\begin{equation*}
+S(\vec Q, t) = \langle s_{-\vec Q}(0) \cdot s_{\vec Q}(t) \rangle,
+\end{equation*}
+with
+\begin{equation*}
+s_{\vec Q}(t) = \sum_{i, \alpha} s_{i, \alpha}(t) e^{-i (\vec R_i +
+  \vec r_\alpha) \cdot \vec Q}
+\end{equation*}
+
+* Method
+The problem is twofold. First, it is a dynamical problem, that is it
+requires to solve the equations of motion of the system to see how
+each spin evolve with time. Second, it is a statistical problem, in
+the sense that the scattering function is defined as an average over
+the canonical ensemble (fixed temperature \(T\)). This is why it will
+be solve in a two steps process:
+1. Sample from the canonical ensemble using MC methods
+2. Evolve each sample in time using semi-classical methods
+
+** TODO The Monte-Carlo step
+The single spin-flip Metropolis Hastings algorithm is used. However,
+it can be quite inefficient at low temperature due to the number of
+rejected samples. To reduce this effect, the solid angle for each spin
+flip is reduced to keep the acceptance rate above 0.4. A pseudocode
+implementation is given below:
+
+#+begin_example
+  Let S[i] the initial system state.
+
+  Repeat N_steps times:
+      While not accepted:
+	  Choose a random site i.
+	  Choose a random 3D unit vector S'.
+	  Let E the energy of the state S[i].
+	  Let E' the energy of the state S[i], with S[i] replaced with S'.
+
+	  If E' < E:
+	      Accept.
+	  Else:
+	      Accept with probability exp((E - E') / kT)
+	  End If
+      End While
+  End Repeat
+#+end_example
+
+/How is actually implemented the solid angle constrained practically
+?/ /Having a running estimator of the acceptance rate, and updating
+the solid angle accordingly ?/
+
+*** TODO Choice of parameters
+- Number of samples: 1000
+- Stride between two samples: enough such that the *stochastic
+  correlation* is less than 0.1.
+
+/how is actually defined the stochastic correlation ? \(Corr(\{\vec
+S_i\}, \{\vec S'_i\})\) ?/
+
+*** TODO Overrelaxation
+At low temperature, the system has trouble to get out of the local
+minimum of energy to explore other regions of the phase space. To
+mitigate this issue, an *overrelaxation* scheme is used.  Recall that
+the hamiltonian can be written in terms of the local field
+\(h_\alpha(\vec R)\) at each site \((\vec R, \alpha)\):
+\begin{equation*}
+  H = \sum_{\vec R \vec R', \alpha, \beta} J_{\alpha, \beta}(\vec R' - \vec R)
+  \vec S_\alpha(\vec R) \cdot \vec S_\beta(\vec R')
+  = \sum_{\vec R, \alpha} \vec h_\alpha(\vec R) \cdot \vec S_\alpha(\vec R)
+\end{equation*}
+One can see that the energy does not change if a spin is rotated,
+while keeping the angle with its local field fixed. This is exploited
+by the overrelaxation method. Each time a spin is selected, it is
+first rotated around its local field, then assigned a random value. If
+it is rejected, the rotation is still kept.
+
+/Is it correct ? Especially, is it applied to each selected spin, or
+only to failing ones ?/
+
+** Semiclasical spin dynamics
+Using the Heisenberg picture equations of motion \(\pdiff{A}{t} =
+i/\hbar [H, A]\), and the spin 1/2 commutation relation \([\hv S^i,
+\hv S^j] = \varepsilon_{ijk} \hv S^k\), one can obtain the
+(semiclassical) non-linear Bloch equations:
+\begin{equation*}
+  \diff{s_i(t)}{t} = - s_i(t) \times
+  \left(
+  \sum_j J_{ij} s_j(t)
+  \right)
+\end{equation*}
+This equation is simply numerically integrated. An 8th order explicit
+Runge-Kutta scheme is used.
+
+*** TODO Choice of parameters
+#+begin_quote
+The RK error parameter as well as the RK order have been fixed in
+order to preserve the Euclidean distance \(d = [\sum_i (\vec
+s_i^{RK} - s_j^{BS})^2]^{1/2}\), i.e. the distance between time
+trajectories obtained with the RK method and with the more robust but
+time consuming Burlisch-Stoer (BS) algorithm.
+#+end_quote
+
+/I could not find how the \(\frac{8(8-1)}2 = 28\) RK8 params are
+defined, along with the timestep./

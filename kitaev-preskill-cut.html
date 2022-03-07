@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Johan Félisaz</title>
+<link rel="stylesheet" href="global.css"><link rel="stylesheet" href="custom.css"><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<header>
+<h1>Johan Félisaz</h1>
+<nav><ul>
+<li><a href="index.html">Home</a></li>
+<li><a href="projects.html">Projects</a></li>
+<li><a href="notes.html">Notes</a></li>
+</ul></nav>
+</header>
+<p>
+</p>
+<p>
+<h2>The Kitaev-Preskill cut</h2>
+</p>
+<p>
+<h3>Context</h3>
+The results of this article holds for a specific class of quantum
+systems: *topologically ordered* two-dimensional media with a *mass gap*.
+</p>
+<p>
+<h4>Mass gap</h4>
+The setup is analogous to the harmonic crystal operator
+ladder. Instead of seeing the quantum system as an Hamiltonian acting
+on a lattice with a simpler system at each site (i.e. spin
+\(\frac12\)), one can see the ground state of the system like the
+vacuum state. This vacuum can be populated by (quasi)particles. Each
+particle can either put the system in an excited state (higher
+eigenenergy), in a less excited state (if it was acting on an excited
+state ; on the vacuum it just yields zero), or leave it in a different
+state of same energy. If there is a gap in the energy spectrum of the
+system between the ground state manifold and the first excited state,
+then this is a mass gap. This means that the quasiparticles have a
+mass (the jump in energy cannot be arbitrarily small yet nonzero).
+</p>
+<p>
+<h4>Topological order</h4>
+The order of the system is topologically protected. This means that
+any weak perturbation cannot destroy the mass gap, or change the order
+of the system to another order, even if it could be possible to have
+it in the first place.
+</p>
+<p>
+<h3>Main result of the paper</h3>
+\begin{equation*}
+S_{\text{topo}} = - \log(D)
+\end{equation*}
+with \(D\) the /total quantum dimension/ of the medium:
+\begin{equation*}
+D = \sqrt{\sum_a d^2_a}
+\end{equation*}
+</p>
+<p>
+<h3>Prerequisites</h3>
+</p>
+<p>
+<h4>The von Neumann entropy</h4>
+It is defined for a specific region, that is a (usually connected)
+subset of the sites. Let's assume \(\rho_{\text{total}}\) is the
+density matrix of the whole system. It is trivial as this is a pure
+state. However, by tracing out all of the sites outside of the region
+of interest, \(\rho\) is no longer a pure state density matrix. The
+*von Neumann entropy* is defined as followed:
+\begin{equation*}
+S(\rho) = \Tr\rho \log \rho
+\end{equation*}
+</p>
+<p>
+A few remarks:
+<ul>
+<li>
+The logarithm is defined by diagonalizing the operator and taking
+</li>
+  the logarihm of the eigenvalues.
+</li>
+<li>
+It is likely that the density operator has zero eigenvalues. We
+</li>
+  choose the convention \(0\log 0 = 0\) to avoid singularities.
+</li>
+</ul>
+</p>
+<p>
+<h3>Main text</h3>
+<h4>Definition of the topological entanglement entropy</h4>
+Let's assume we are interested in the von Neumann entropy of a given
+region of boundary length \(L\), large compared to the correlation
+length. It follows the following infinite size expansion:
+\begin{equation*}
+S = \alpha L - \gamma + \ldots
+\end{equation*}
+</p>
+<p>
+\(\alpha\) is not universal, and depends on the hamiltonian and
+geometry of the system. However, as we'll show soon, \(-\gamma\) is
+universal and topological. It is called the *topological entanglement
+entropy*.  In practise, this expansion is complicated to use to
+compute the entropy. It is easier to use another expression for
+it. Consider the following system, composed of four regions A, B, C
+and D:
+</p>
+<p>
+\begin{figure}[htp]
+  \centering
+  \begin{tikzpicture}
+    \draw (0, 0) circle(1);
+    
+    \draw (0, 0) -- (0, 1);
+    \draw[rotate=-120] (0, 0) -- (0, 1);
+    \draw[rotate=120] (0, 0) -- (0, 1);
+</p>
+<p>
+    \draw (-1.5, -1.1) rectangle (1.5, 1.1);
+    
+    \node at (-0.45, 0.4) {A};
+    \node at (0.45, 0.4) {B};
+    \node at (0, -0.5) {C};
+    \node at (-1.2, 0.8) {D};
+  \end{tikzpicture}
+\end{figure}
+</p>
+<p>
+The topological entanglement entropy is defined as such:
+\begin{equation*}
+S_{topo} = S_A + S_B + S_C - S_{AB} - S_{BC} - S_{AC} + S_{ABC},
+\end{equation*}
+where \(AB = A \cup B\) and so on.
+</p>
+<p>
+<h4>Proof that \(S_{topo}\) is topological invariant</h4>
+Let's assume that the boundary between C and D is slightly
+deformed. The change in entropy can be written as follow:
+\begin{equation*}
+\Delta S_{topo} = (\Delta S_{ABC} - \Delta S_{BC}) - (\Delta S_{AC} - \Delta S_C)
+\end{equation*}
+As the regions are large compared to the correlation length, appending
+the region A to BC have little effect on the /change/ of entropy. Thus
+the first term on the right hand side vanishes. Similarly, the second
+one does too, and the entropy remains unchanged.
+</p>
+<p>
+Now, let's see what happens when a triple point, like the one between
+B, C and D is deformed. Because the ground state is a bipartite pure
+state, entropies of both subsystems are equal. That is, \(S_{ABC} =
+S_{D}\) and \(S_{BC} = S_{AD}\). Thus the change in entropy can be expressed as
+\begin{equation*}
+  \Delta S_{topo} = (\Delta S_B - \Delta S_{AB}) +
+  (\Delta S_C - \Delta S_{AC}) +
+  (\Delta S_D - \Delta S_{AD})
+\end{equation*}
+Using the same argument as before, the three terms vanishes.
+</p>
+<p>
+<h4>Proof that \(S_{topo}\) is universal</h4>
+A *universal quantity* does not change when the hamiltonian is
+smoothly deformed. Let's assume that the hamiltonian is a sum of local
+terms, and that the correlation length stays small compared to the
+regions defined along the deformation. Two cases here:
+<ul>
+<li>
+If the changes are far away from a given region, its entropy is not
+</li>
+  affected.
+</li>
+<li>
+If the changes are close to a region, using the topological
+</li>
+  invariance, we are free to move back the boundaries until it's far
+</li>
+  enough to neglect the effect of the deformation. After the
+</li>
+  hamitonian changes, the boundaries can be put back were they were.
+</li>
+  
+</li>
+<h4>A more topological formulation of \(S_{topo}\)</h4>
+</li>
+It helps to glue the medium with its time-reversal conjugate at
+</li>
+spatial infinity. It can now be seen as a sphere with 4 holes. We can
+</li>
+now exploit the composition property of the entropy. On one side, both
+</li>
+the medium and its conjugate carry an entropy \(S_{topo}\). On the
+</li>
+other hand, the usual formula for the entropy, and the fact that the
+</li>
+entropy depends only on the topology (number of punctures) of each
+</li>
+region:
+</li>
+\begin{equation*}
+</li>
+  2S_{topo} = S_A + S_B + S_C - S_{AB} - S_{BC} - S_{AC}
+</li>
+  = 3S_4 - 4S_3,
+</li>
+\end{equation*}
+</li>
+where \(S_3\) and \(S_4\) are the entropies of a sphere with 3 or 4
+</li>
+punctures.
+</li>
+</ul>
+</p>
+<p>
+<h4>Computing \(S_{topo}\) using TQFT methods</h4>
+<h5>Standard proof</h5>
+<h5>Simpler proof using CFT</h5>
+</p>
+<p>
+<h3>Questions</h3>
+<ul>
+<li>
+why does equation 1 hold ?
+</li>
+<li>
+what is a superselection sector ?
+</li>
+<li>
+what is an abelian anyon ?
+</li>
+<li>
+what is a \(SU(2)_k\) Chern-Simons theory ?
+</li>
+<li>
+why ambiguity between terms that scales with \(L\) and constant ones
+</li>
+  ?
+</li>
+<li>
+what is a mass gap ?
+</li>
+<li>
+chirality in this context ?
+</li>
+<li>
+topological S-matrix ?
+</li>
+<li>
+what's a Wilson loop ?
+</li>
+<li>
+what's a conformal field theory ?
+</li>
+<li>
+modular transformation ?
+</li>
+</ul>
+<footer>
+&copy; Johan Félisaz 2022. Generated using a custom AWK <a href="export.awk">script</a>
+</footer>
+</body>
+</html>

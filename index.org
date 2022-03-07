@@ -1,6 +1,16 @@
 #+title: About me
 
+#+begin_export html
+<img src="img/profile_pic.jpg" alt="profile pic"
+     style="max-width: 30%; display: block; margin: 10px auto 10px;">
+#+end_export
+
 Hi ! I am Johan Félisaz, a (recently graduated) master physics student
-at EPFL (Switzerland). My main interest are in condensed matter and
+at EPFL (Switzerland). My main interests are in condensed matter and
 quantum science, and the various numerical methods to tackle these
 problems; included, but not limited to, deep learning techniques.
+
+Links:
+- [[https://github.com/Joh11/][Github]]
+- [[https://www.linkedin.com/in/johan-f%C3%A9lisaz-2b0087159/][LinkedIn]]
+- Email: name dot surname at protonmail dot com

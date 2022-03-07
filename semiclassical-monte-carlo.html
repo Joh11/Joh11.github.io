@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Johan Félisaz</title>
+<link rel="stylesheet" href="global.css"><link rel="stylesheet" href="custom.css"><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<header>
+<h1>Johan Félisaz</h1>
+<nav><ul>
+<li><a href="index.html">Home</a></li>
+<li><a href="projects.html">Projects</a></li>
+<li><a href="notes.html">Notes</a></li>
+</ul></nav>
+</header>
+<p>
+<h2>The semiclassical Monte-Carlo method</h2>
+</p>
+<p>
+This is an overview of the semiclassical Monte-Carlo (SC-MC) method,
+as used in the paper <a href="https://arxiv.org/abs/1403.7903"></a>antiferromagnetic Heisenberg model on the kagome lattice"]]. It uses the
+method on a Kagome lattice, but it can be applied to any lattice. It
+relies on the Heisenberg model, that is the \(S \rightarrow \infty\)
+limit, with quantum spins replaced by unit vectors in
+\(\R^3\).
+</p>
+<p>
+<h3>Goal</h3>
+This is used to compute the *dynamical structure factor*, also called
+*scattering function*:
+</p>
+<p>
+\begin{equation*}
+S(\vec Q, t) = \langle s_{-\vec Q}(0) \cdot s_{\vec Q}(t) \rangle,
+\end{equation*}
+with
+\begin{equation*}
+s_{\vec Q}(t) = \sum_{i, \alpha} s_{i, \alpha}(t) e^{-i (\vec R_i +
+  \vec r_\alpha) \cdot \vec Q}
+\end{equation*}
+</p>
+<p>
+<h3>Method</h3>
+The problem is twofold. First, it is a dynamical problem, that is it
+requires to solve the equations of motion of the system to see how
+each spin evolve with time. Second, it is a statistical problem, in
+the sense that the scattering function is defined as an average over
+the canonical ensemble (fixed temperature \(T\)). This is why it will
+be solve in a two steps process:
+1. Sample from the canonical ensemble using MC methods
+2. Evolve each sample in time using semi-classical methods
+</p>
+<p>
+<h4>TODO The Monte-Carlo step</h4>
+The single spin-flip Metropolis Hastings algorithm is used. However,
+it can be quite inefficient at low temperature due to the number of
+rejected samples. To reduce this effect, the solid angle for each spin
+flip is reduced to keep the acceptance rate above 0.4. A pseudocode
+implementation is given below:
+</p>
+<p>
+  Let S[i] the initial system state.
+</p>
+<p>
+  Repeat N_steps times:
+      While not accepted:
+	  Choose a random site i.
+	  Choose a random 3D unit vector S'.
+	  Let E the energy of the state S[i].
+	  Let E' the energy of the state S[i], with S[i] replaced with S'.
+</p>
+<p>
+	  If E' < E:
+	      Accept.
+	  Else:
+	      Accept with probability exp((E - E') / kT)
+	  End If
+      End While
+  End Repeat
+</p>
+<p>
+/How is actually implemented the solid angle constrained practically
+?/ /Having a running estimator of the acceptance rate, and updating
+the solid angle accordingly ?/
+</p>
+<p>
+<h5>TODO Choice of parameters</h5>
+<ul>
+<li>
+Number of samples: 1000
+</li>
+<li>
+Stride between two samples: enough such that the *stochastic
+</li>
+  correlation* is less than 0.1.
+</li>
+</ul>
+</p>
+<p>
+/how is actually defined the stochastic correlation ? \(Corr(\{\vec
+S_i\}, \{\vec S'_i\})\) ?/
+</p>
+<p>
+<h5>TODO Overrelaxation</h5>
+At low temperature, the system has trouble to get out of the local
+minimum of energy to explore other regions of the phase space. To
+mitigate this issue, an *overrelaxation* scheme is used.  Recall that
+the hamiltonian can be written in terms of the local field
+\(h_\alpha(\vec R)\) at each site \((\vec R, \alpha)\):
+\begin{equation*}
+  H = \sum_{\vec R \vec R', \alpha, \beta} J_{\alpha, \beta}(\vec R' - \vec R)
+  \vec S_\alpha(\vec R) \cdot \vec S_\beta(\vec R')
+  = \sum_{\vec R, \alpha} \vec h_\alpha(\vec R) \cdot \vec S_\alpha(\vec R)
+\end{equation*}
+One can see that the energy does not change if a spin is rotated,
+while keeping the angle with its local field fixed. This is exploited
+by the overrelaxation method. Each time a spin is selected, it is
+first rotated around its local field, then assigned a random value. If
+it is rejected, the rotation is still kept.
+</p>
+<p>
+/Is it correct ? Especially, is it applied to each selected spin, or
+only to failing ones ?/
+</p>
+<p>
+<h4>Semiclasical spin dynamics</h4>
+Using the Heisenberg picture equations of motion \(\pdiff{A}{t} =
+i/\hbar [H, A]\), and the spin 1/2 commutation relation \([\hv S^i,
+\hv S^j] = \varepsilon_{ijk} \hv S^k\), one can obtain the
+(semiclassical) non-linear Bloch equations:
+\begin{equation*}
+  \diff{s_i(t)}{t} = - s_i(t) \times
+  \left(
+  \sum_j J_{ij} s_j(t)
+  \right)
+\end{equation*}
+This equation is simply numerically integrated. An 8th order explicit
+Runge-Kutta scheme is used.
+</p>
+<p>
+<h5>TODO Choice of parameters</h5>
+The RK error parameter as well as the RK order have been fixed in
+order to preserve the Euclidean distance \(d = [\sum_i (\vec
+s_i^{RK} - s_j^{BS})^2]^{1/2}\), i.e. the distance between time
+trajectories obtained with the RK method and with the more robust but
+time consuming Burlisch-Stoer (BS) algorithm.
+</p>
+<p>
+/I could not find how the \(\frac{8(8-1)}2 = 28\) RK8 params are
+defined, along with the timestep./
+</p>
+<footer>
+&copy; Johan Félisaz 2022. Generated using a custom AWK <a href="export.awk">script</a>
+</footer>
+</body>
+</html>
