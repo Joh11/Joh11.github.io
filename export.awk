@@ -5,9 +5,7 @@
 # Currently implemented:
 
 # To Do:
-# - links
 # - emphasis
-# - navbar
 
 function footer() {
     print "<footer>"
@@ -67,9 +65,31 @@ END {
 
 /^#\+/ { to_process = 0; } # skip for now
 
+# headlines
 /^\*+ / {
     hl = length($1);
     hn(hl+2, substr($0, hl+2));
+    to_process = 0;
+}
+
+# remove the file: protocol if necessary
+# change .org to .html in file extensions
+function process_url(url) {
+    if (url ~ /^file:/) url = substr(url, 6);
+    if (url ~ /\.org$/) url = substr(url, 1, length(url) - 3) "html"
+    return url;
+}
+
+# links
+/\[\[/ {
+    # no multiline support for now
+    link_start = match($0, /\[\[/);
+    link_sep = match($0, /\]\[/);
+    link_end = match($0, /\]\]/);
+    url = process_url(substr($0, link_start + 2, link_sep - link_start - 2));
+    desc = substr($0, link_sep + 2, link_end - link_sep - 2);
+    printf("%s<a href=\"%s\">%s</a>%s", "", url, desc, "");
+    
     to_process = 0;
 }
 
