@@ -47,9 +47,13 @@ BEGIN {
     print "</head>"    
     print "<body>"
     navbar()
+
+    close_par = 0; # set if a paragraph must be closed with </p>
 }
 
 END {
+    if (close_par) print "</p>";
+    
     footer()
     print "</body>"
     print "</html>"
@@ -58,6 +62,13 @@ END {
 # to_process is a boolean to make sure that lines that are processed
 # in a special way (i.e. headlines) are not exported twice
 { to_process = 1; }
+
+/^$/ {
+    if (close_par) print "</p>";
+    print "<p>";
+    close_par = 1;
+    to_process = 0;
+}
 
 /^#\+title: / {
     hn(2, substr($0, 10));

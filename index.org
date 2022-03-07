@@ -1,3 +1,6 @@
 #+title: About me
 
-[[file:notes.org][test link]]
+Hi ! I am Johan Félisaz, a (recently graduated) master physics student
+at EPFL (Switzerland). My main interest are in condensed matter and
+quantum science, and the various numerical methods to tackle these
+problems; included, but not limited to, deep learning techniques.
