@@ -1,3 +1,12 @@
 footer {
     text-align: center;
 }
+
+header nav ul {
+    display: flex;
+    justify-content: space-around;
+}
+
+header nav li {
+    list-style-type: none
+}
