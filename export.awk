@@ -31,6 +31,7 @@ function navbar() {
     print "<li><a href=\"index.html\">Home</a></li>"
     print "<li><a href=\"projects.html\">Projects</a></li>"
     print "<li><a href=\"notes.html\">Notes</a></li>"
+    print "<li><a href=\"key.asc\">GPG</a></li>"
     print "</ul></nav>"
     
     print "</header>"
