@@ -15,6 +15,7 @@ let settings = {
 function mousemoved(e) {
     if(e.buttons == 1)
     {
+	console.log('displacement: ', e.movementX / 100, ' ', e.movementY / 100)
 	settings.controls.movex += e.movementX / 100
 	settings.controls.movey += e.movementY / 100
     }
@@ -87,7 +88,56 @@ function main() {
         return;
     }    
 
-    canvas.addEventListener('pointermove', mousemoved)
+    function touch_to_mouse_wrapper(callback) {
+	return e => {
+	    if(e.touches.length >= 1) {
+		callback(e.touches[0])
+		e.preventDefault()
+	    }
+	}
+    }
+
+    const touch_move = touch_to_mouse_wrapper(mouse_move)
+    let prev_x
+    let prev_y
+    
+    // Mouse move stuff
+    function mouse_down(e) {
+	// if press mouse start recording
+	canvas.addEventListener('mousemove', mouse_move)
+	canvas.addEventListener('mouseup', mouse_up)
+
+	canvas.addEventListener('touchmove', touch_move)
+	canvas.addEventListener('touchcancel', mouse_up)
+	canvas.addEventListener('touchend', mouse_up)
+
+	prev_x = e.clientX
+	prev_y = e.clientY
+    }
+
+    function mouse_move(e) {
+	const dx = e.clientX - prev_x
+	const dy = e.clientY - prev_y
+
+	prev_x = e.clientX
+	prev_y = e.clientY
+	
+	settings.controls.movex += dx / 100
+	settings.controls.movey += dy / 100
+    }
+
+    function mouse_up(e) {
+	canvas.removeEventListener('mousemove', mouse_move)
+	canvas.removeEventListener('mouseup', mouse_up)
+
+	canvas.removeEventListener('touchmove', touch_move)
+	canvas.removeEventListener('touchcancel', mouse_up)
+	canvas.removeEventListener('touchend', mouse_up)
+    }
+    
+    canvas.addEventListener('mousedown', mouse_down)
+    canvas.addEventListener('touchstart', touch_to_mouse_wrapper(mouse_down))
+    
     add_settings_callback(gl)
 
     // shader for faces of the BZ
