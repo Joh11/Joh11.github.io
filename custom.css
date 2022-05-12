@@ -10,3 +10,8 @@ header nav ul {
 header nav li {
     list-style-type: none
 }
+
+canvas {
+    display: block;
+    margin: 0 auto;
+}

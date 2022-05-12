@@ -9,7 +9,7 @@ let settings = {
     },
     filled: true, // false if wireframe option is selected
     bufs: {},
-    controls: {movex: 0, movey: 0, zoom: 0}
+    controls: {movex: 0, movey: 0}
 }
 
 function mousemoved(e) {
@@ -21,6 +21,8 @@ function mousemoved(e) {
 }
 
 function add_settings_callback(gl) {
+    // to rotate the BZ
+    
     // lattice parameters
     const a = document.querySelector('#bz-form input[type="number"][name="a"]')
     const b = document.querySelector('#bz-form input[type="number"][name="b"]')
@@ -73,7 +75,7 @@ function add_settings_callback(gl) {
 }
 
 function reset_camera() {
-    settings.controls = {movex: 0, movey: 0, zoom: 0}
+    settings.controls = {movex: 0, movey: 0}
 }
 
 function main() {
@@ -83,11 +85,9 @@ function main() {
     if (!gl) {
         alert('Unable to initialize WebGL. Your browser or machine may not support it.');
         return;
-    }
+    }    
 
     canvas.addEventListener('mousemove', mousemoved)
-    canvas.addEventListener('wheel', e => settings.controls.zoom += e.deltaY / 500)
-
     add_settings_callback(gl)
 
     // shader for faces of the BZ
@@ -193,8 +193,6 @@ function load_shader(gl, type, source) {
 }
 
 function recompute_buffers(gl) {
-    const start_time = performance.now()
-    
     function set_buf(buf, target, arrayfun, usage, data) {
 	gl.bindBuffer(target, buf)
 	gl.bufferData(target, new arrayfun(data), usage)
@@ -265,9 +263,6 @@ function recompute_buffers(gl) {
 
     settings.bufs.nidx = idx.length
     settings.bufs.nidx_line = idx_line.length
-
-    const end_time = performance.now()
-    console.log('computing buffers took ', end_time-start_time, ' ms')
 }
 
 function init_buffers(gl) {
@@ -314,8 +309,7 @@ function draw_scene(gl, face_prog_info, edge_prog_info) {
 	gl.uniformMatrix4fv(face_prog_info.uniforms.model, false,
 			    m4_transpose(m4_mul(m4_translation([0, 0, -6]),
 						m4_rotationx(settings.controls.movey),
-						m4_rotationy(settings.controls.movex),
-						m4_scale(Math.exp(settings.controls.zoom)))))
+						m4_rotationy(settings.controls.movex))))
 
 	// draw the faces
 	gl.drawElements(gl.TRIANGLES, settings.bufs.nidx, gl.UNSIGNED_SHORT, 0)
@@ -339,8 +333,7 @@ function draw_scene(gl, face_prog_info, edge_prog_info) {
     gl.uniformMatrix4fv(edge_prog_info.uniforms.model, false,
 			m4_transpose(m4_mul(m4_translation([0, 0, -6]),
 						m4_rotationx(settings.controls.movey),
-						m4_rotationy(settings.controls.movex),
-						m4_scale(Math.exp(settings.controls.zoom)))))
+						m4_rotationy(settings.controls.movex))))
 
     // draw the edges
     gl.drawElements(gl.LINES, settings.bufs.nidx_line, gl.UNSIGNED_SHORT, 0)

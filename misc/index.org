@@ -1,3 +1,6 @@
 #+title: Misc pages
 
 A collection of stuff.
+
+- [[file:bz.org][Brillouin zone visualization]]: a WebGL app to visualize the Brillouin
+  zone for a given lattice, and play with it interactively
