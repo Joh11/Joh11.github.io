@@ -87,7 +87,7 @@ function main() {
         return;
     }    
 
-    canvas.addEventListener('mousemove', mousemoved)
+    canvas.addEventListener('pointermove', mousemoved)
     add_settings_callback(gl)
 
     // shader for faces of the BZ
