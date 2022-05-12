@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Johan Félisaz</title>
+<link rel="stylesheet" href="/global.css"><link rel="stylesheet" href="/custom.css"><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<header>
+<h1>Johan Félisaz</h1>
+<nav><ul>
+<li><a href="/index.html">Home</a></li>
+<li><a href="/projects.html">Projects</a></li>
+<li><a href="/notes.html">Notes</a></li>
+<li><a href="/key.asc">GPG</a></li>
+</ul></nav>
+</header>
+<h2>Brillouin zone visualization</h2>
+<p>
+<canvas id="bz-canvas" width="640" height="480"></canvas>
+</p>
+<p>
+<form id="bz-form">
+  <fieldset>
+    <legend>Lattice</legend>
+    
+    <div><label for="a">a (arb. unit)</label>
+      <input type="number" name="a" value="1" step="0.01"></div>
+    <div><label for="b">b (arb. unit)</label>
+      <input type="number" name="b" value="1" step="0.01"></div>
+    <div><label for="c">c (arb. unit)</label>
+      <input type="number" name="c" value="1" step="0.01"></div>
+    <div><label for="alpha">α (°)</label>
+      <input type="number" name="alpha" value="90"></div>
+    <div><label for="beta">β (°)</label>
+      <input type="number" name="beta" value="90"></div>
+    <div><label for="gamma">γ (°)</label>
+      <input type="number" name="gamma" value="90"></div>
+</p>
+<p>
+    <input type="button" value="Cubic">
+    <input type="button" value="FCC">
+    <input type="button" value="BCC">
+  </fieldset>
+</p>
+<p>
+  <fieldset>
+    <legend>Display options</legend>
+    <div>
+      <input type="radio" name="display-options" value="filled" checked>
+      <label for="filled">Filled</label>
+    </div>
+    <div>
+      <input type="radio" name="display-options" value="wireframe">
+      <label for="wireframe">Wireframe</label>
+    </div>
+    <div>
+      <input type="button" value="Reset camera">
+    </div>
+  </fieldset>
+</form>
+</p>
+<p>
+<script src="vecmath.js"></script>
+<script src="bz.js"></script>
+</p>
+<footer>
+&copy; Johan Félisaz 2022. Generated using a custom AWK <a href="/export.awk">script</a>
+</footer>
+</body>
+</html>

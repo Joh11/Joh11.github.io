@@ -10,7 +10,7 @@
 
 function footer() {
     print "<footer>"
-    print "&copy; Johan Félisaz 2022. Generated using a custom AWK <a href=\"export.awk\">script</a>"
+    print "&copy; Johan Félisaz 2022. Generated using a custom AWK <a href=\"/export.awk\">script</a>"
     print "</footer>"
 }
 
@@ -28,10 +28,10 @@ function navbar() {
     hn(1, "Johan Félisaz");
     
     print "<nav><ul>"
-    print "<li><a href=\"index.html\">Home</a></li>"
-    print "<li><a href=\"projects.html\">Projects</a></li>"
-    print "<li><a href=\"notes.html\">Notes</a></li>"
-    print "<li><a href=\"key.asc\">GPG</a></li>"
+    print "<li><a href=\"/index.html\">Home</a></li>"
+    print "<li><a href=\"/projects.html\">Projects</a></li>"
+    print "<li><a href=\"/notes.html\">Notes</a></li>"
+    print "<li><a href=\"/key.asc\">GPG</a></li>"
     print "</ul></nav>"
     
     print "</header>"
@@ -41,9 +41,10 @@ BEGIN {
     print "<!DOCTYPE html>"
     print "<html>"
     print "<head>"
+    print "<meta charset=\"utf-8\">"
     print "<title>Johan Félisaz</title>"
-    css("global.css")
-    css("custom.css")
+    css("/global.css")
+    css("/custom.css")
     print "<script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>"
     print "<script id=\"MathJax-script\" async src=\"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js\"></script>"
     print "</head>"    

@@ -1,0 +1,46 @@
+#+title: Brillouin zone visualization
+
+#+begin_export html
+<canvas id="bz-canvas" width="640" height="480"></canvas>
+
+<form id="bz-form">
+  <fieldset>
+    <legend>Lattice</legend>
+    
+    <div><label for="a">a (arb. unit)</label>
+      <input type="number" name="a" value="1" step="0.01"></div>
+    <div><label for="b">b (arb. unit)</label>
+      <input type="number" name="b" value="1" step="0.01"></div>
+    <div><label for="c">c (arb. unit)</label>
+      <input type="number" name="c" value="1" step="0.01"></div>
+    <div><label for="alpha">α (°)</label>
+      <input type="number" name="alpha" value="90"></div>
+    <div><label for="beta">β (°)</label>
+      <input type="number" name="beta" value="90"></div>
+    <div><label for="gamma">γ (°)</label>
+      <input type="number" name="gamma" value="90"></div>
+
+    <input type="button" value="Cubic">
+    <input type="button" value="FCC">
+    <input type="button" value="BCC">
+  </fieldset>
+
+  <fieldset>
+    <legend>Display options</legend>
+    <div>
+      <input type="radio" name="display-options" value="filled" checked>
+      <label for="filled">Filled</label>
+    </div>
+    <div>
+      <input type="radio" name="display-options" value="wireframe">
+      <label for="wireframe">Wireframe</label>
+    </div>
+    <div>
+      <input type="button" value="Reset camera">
+    </div>
+  </fieldset>
+</form>
+
+<script src="vecmath.js"></script>
+<script src="bz.js"></script>
+#+end_export
