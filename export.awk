@@ -7,6 +7,8 @@
 # To Do:
 # - emphasis
 # - lists (unordered)
+# - rewrite everything in Python, this is turning into spaghetti code too
+#   quickly
 
 function footer() {
     print "<footer>"
@@ -31,6 +33,7 @@ function navbar() {
     print "<li><a href=\"/index.html\">Home</a></li>"
     print "<li><a href=\"/projects.html\">Projects</a></li>"
     print "<li><a href=\"/notes.html\">Notes</a></li>"
+    print "<li><a href=\"/misc/\">Misc</a></li>"
     print "<li><a href=\"/key.asc\">GPG</a></li>"
     print "</ul></nav>"
     
@@ -118,7 +121,8 @@ function process_url(url) {
     link_end = match($0, /\]\]/);
     url = process_url(substr($0, link_start + 2, link_sep - link_start - 2));
     desc = substr($0, link_sep + 2, link_end - link_sep - 2);
-    printf("%s<a href=\"%s\">%s</a>%s", substr($0, 1, link_start - 1), url, desc, "");
+    printf("%s<a href=\"%s\">%s</a>%s", substr($0, 1, link_start - 1),
+	   url, desc, substr($0, link_end + 2));
     
     to_process = 0;
 }
