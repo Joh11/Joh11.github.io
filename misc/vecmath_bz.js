@@ -1,3 +1,5 @@
+// Old version of vecmath, used only by bz.js, hence the name
+
 // Matrix manipulation stuff
 
 // order: dimension, and vector then matrix

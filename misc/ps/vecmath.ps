@@ -1,0 +1,135 @@
+;; -*- mode: Lisp;-*-
+
+;; common
+
+(defun v-norm (v)
+  (sqrt
+   (chain v (map (lambda (x) (* x x)))
+	  (reduce (lambda (x y) (+ x y))))))
+
+;; v2
+
+(defun v2 (x y) (array x y))
+
+(defun v2* (a v)
+  (array (* (@ v 0) a)
+	 (* (@ v 1) a)))
+
+(defun v2/ (v a)
+  (array (/ (@ v 0) a)
+	 (/ (@ v 1) a)))
+
+(defun v2+ (&rest vs)
+  (case (length vs)
+    (0 (v2 0 0))
+    (1 (@ vs 0))
+    (otherwise
+     (labels ((f (u v)
+		(array (+ (@ u 0) (@ v 0))
+		       (+ (@ u 1) (@ v 1)))))
+       (let ((acc (@ vs 0)))
+	 (dotimes (i (1- (length vs)) acc)
+	   (setf acc (f acc (@ vs (1+ i))))))))))
+
+(defun v2-sub (u v)
+  (array (- (@ u 0) (@ v 0))
+	 (- (@ u 1) (@ v 1))))
+
+(defun v2-dot (u v)
+  (+ (* (@ u 0) (@ v 0))
+     (* (@ u 1) (@ v 1))))
+
+;; v3
+
+(defun v3 (x y z) (array x y z))
+
+(defun v3/ (v a)
+  (array (/ (@ v 0) a)
+	 (/ (@ v 1) a)
+	 (/ (@ v 2) a)))
+
+(defun v3+ (&rest vs)
+  (case (length vs)
+    (0 (v3 0 0 0))
+    (1 (@ vs 0))
+    (otherwise
+     (labels ((f (u v)
+		(array (+ (@ u 0) (@ v 0))
+		       (+ (@ u 1) (@ v 1))
+		       (+ (@ u 2) (@ v 2)))))
+       (let ((acc (@ vs 0)))
+	 (dotimes (i (1- (length vs)) acc)
+	   (setf acc (f acc (@ vs (1+ i))))))))))
+
+(defun v3* (a v)
+  (array (* (@ v 0) a)
+	 (* (@ v 1) a)
+	 (* (@ v 2) a)))
+
+(defun v3-sub (u v)
+  (array (- (@ u 0) (@ v 0))
+	 (- (@ u 1) (@ v 1))
+	 (- (@ u 2) (@ v 2))))
+
+(defun v3-normalize (v)
+  (v3/ v (v-norm v)))
+
+;; m4
+
+(defun m4-zero ()
+  ([] 0 0 0 0
+      0 0 0 0
+      0 0 0 0
+      0 0 0 0))
+
+(defun m4-transpose (m)
+  (array (@ m 0) (@ m 4) (@ m 8)  (@ m 12)
+	 (@ m 1) (@ m 5) (@ m 9)  (@ m 13)
+	 (@ m 2) (@ m 6) (@ m 10) (@ m 14)
+	 (@ m 3) (@ m 7) (@ m 11) (@ m 15)))
+
+(defun m4-perspective (fov-deg aspect near far)
+  (let ((fov-rad (* (@ -math *pi*) fov-deg (/ 1 180)))
+	(ret (m4-zero)))
+    (setf (@ ret 0) (/ 1 (* aspect (chain -math (tan (/ fov-rad 2))))))
+    (setf (@ ret 5) (/ 1 (chain -math (tan (/ fov-rad 2)))))
+    (setf (@ ret 10) (- (/ (+ far near) (- far near))))
+    (setf (@ ret 11) (/ (* -2 far near) (- far near)))
+    (setf (@ ret 14) -1)
+    ret))
+
+(defmacro m4-@ (res i j)
+  `(@ ,res (+ (* 4 ,i) ,j)))
+
+(defun m4-mul (&rest factors)
+  (case (length factors)
+    (0 (m4-identity))
+    (1 (@ factors 0))
+    (otherwise
+     (labels ((mul2 (a b)
+		(let ((res (m4-zero)))
+		  (dotimes (i 4 res)
+		    (dotimes (j 4)
+		      (dotimes (k 4)
+			(incf (m4-@ res i j) (* (m4-@ a i k) (m4-@ b k j)))))))))
+       (let ((acc (@ factors 0)))
+	 (dotimes (i (1- (length factors)) acc)
+	   (setf acc (mul2 acc (@ factors (1+ i))))))))))
+
+(defun m4-translation (v)
+  (array 1 0 0 (@ v 0)
+	 0 1 0 (@ v 1)
+	 0 0 1 (@ v 2)
+	 0 0 0 1))
+
+(defun m4-rotationx (a)
+  (array 1 0       0           0
+	 0 (cos a) (- (sin a)) 0
+	 0 (sin a) (cos a)     0
+	 0 0       0           1))
+
+(defun m4-rotationy (a)
+  (array (cos a)     0 (sin a) 0
+	 0           1 0       0
+	 (- (sin a)) 0 (cos a) 0
+	 0           0 0       1))

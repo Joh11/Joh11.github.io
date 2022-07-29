@@ -1,0 +1,832 @@
+;; -*- mode: Lisp;-*-
+
+(defmacro window-on-load (&body body)
+  `(setf (@ window onload) (lambda () ,@body)))
+
+(defmacro @gl (&rest args)
+  "Anaphoric macro (implicitly using GL), transforming the form in a
+  field of GL, or a method call depending on the number of
+  arguments (1 => field access, 2 or more => method call). "
+  (case (length args)
+    (0 (error "zero args for @gl macro"))
+    (1 `(@ gl ,@args))
+    (otherwise `(chain gl (,@args)))))
+
+(defun clear-screen (gl &optional (r 0) (g 0) (b 0))
+  (@gl clear-color r g b 1)
+  (@gl clear (logior (@gl *color_buffer_bit*)
+		     (@gl *color_depth_bit*))))
+
+(defmacro with-gl-context ((gl canvas canvas-id) &body body)
+  `(let* ((,canvas (chain document (query-selector ,canvas-id)))
+	  (,gl (chain ,canvas (get-context "webgl" (create alpha f)))))
+     (when (= ,gl nil)
+       (alert "unable to initialize WebGL !"))
+     
+     ,@body))
+
+;; logging functions
+(defmacro print (&rest args)
+  `(chain console (log ,@args)))
+(defmacro warn (&rest args)
+  `(chain console (warn ,@args)))
+(defmacro error (&rest args)
+  `(chain console (error ,@args)))
+
+;; function version of some methods for readability
+
+(defun mapcar (fun arr)
+  (chain arr (map fun)))
+
+(defun flat (arr)
+  (chain arr (flat)))
+
+(defun concat (arr1 arr2)
+  (chain arr1 (concat arr2)))
+
+;; misc functions
+
+(defun clamp (val min max)
+  (when (> val max) (warn "val greater than max"))
+  (when (< val min) (warn "val lesser than min"))
+  (cond ((< val min) min)
+	((> val max) max)
+	(t val)))
+
+(defun ^2 (x) (* x x))
+
+(defmacro create-from-vars (&rest vars)
+  "Use to write (create a a b b) as (create-from-vars a b)."
+  (labels ((rec (vs)
+	     (if (null vs) nil
+		 (cons (car vs) (cons (car vs) (rec (cdr vs)))))))
+    (cons 'create (rec vars))))
+
+(defun array-of-arrays (n)
+  "Returns an array, containing N *different* empty arrays. "
+  (chain (-array n) (fill 0) (map (lambda (x) ([])))))
+
+(defun bind-buffer-replace-type (gl type)
+  (if (stringp type)
+      (cond ((string= type :array-buffer) (@gl *array_buffer*))
+	    ((string= type :element-array-buffer) (@gl *element_array_buffer*))
+	    (t (error "bind-buffer: invalid type" type)))
+      type))
+
+(defun bind-buffer (gl type buf)
+  (@gl bind-buffer (bind-buffer-replace-type gl type) buf))
+
+(defparameter vs-src-3d "
+attribute vec3 pos;
+
+uniform mat4 model;
+uniform mat4 proj;
+
+void main() {
+  gl_Position = proj * model * vec4(pos, 1.0);
+}
+")
+
+(defparameter vs-src-3d-normal "
+attribute vec3 pos;
+attribute vec3 normal;
+
+uniform mat4 model;
+uniform mat4 proj;
+
+varying lowp vec3 v_normal;
+
+void main() {
+  v_normal = mat3(model) * normal;
+  gl_Position = proj * model * vec4(pos, 1.0);
+}
+")
+
+(defparameter vs-src-3d-normal-color "
+attribute vec3 pos;
+attribute vec3 normal;
+attribute vec3 color;
+
+uniform mat4 model;
+uniform mat4 proj;
+
+varying lowp vec3 v_normal;
+varying lowp vec3 v_color;
+
+void main() {
+  v_normal = mat3(model) * normal;
+  v_color = color;
+  gl_Position = proj * model * vec4(pos, 1.0);
+}
+")
+
+(defparameter fs-src-normal-varying-color "
+precision lowp float;
+
+varying lowp vec3 v_normal;
+varying lowp vec3 v_color;
+
+void main() {
+  vec4 c = vec4(v_color.x, v_color.y, v_color.z, 1);
+  c.rgb *= (0.75 + 0.25 * max(0.0, normalize(v_normal).z));
+  gl_FragColor = c;
+}
+")
+
+(defun shader-src-normal-constant-color (r g b &optional (a 1))
+  (+ "
+precision lowp float;
+
+varying lowp vec3 v_normal;
+
+void main() {
+  vec4 c = vec4(" r ", " g ", " b ", " a ");
+  c.rgb *= (0.75 + 0.25 * max(0.0, normalize(v_normal).z));
+  gl_FragColor = c;
+}
+"))
+
+(defun shader-src-constant-color (r g b &optional (a 1))
+  (+ "void main() {
+  gl_FragColor = vec4(" r ", " g ", " b ", " a ");
+}"))
+
+(defun init-shader-program (gl vs-src fs-src)
+  (let* ((vs (load-shader gl :vertex-shader vs-src))
+	 (fs (load-shader gl :fragment-shader fs-src))
+	 (shader (chain gl (create-program))))
+    (@gl attach-shader shader vs)
+    (@gl attach-shader shader fs)
+    (@gl link-program shader)
+
+    (unless (@gl get-program-parameter shader (@gl *link_status*))
+      (alert (+ "unable to init shader program: "
+		(@gl get-program-info-log shader)))
+      (return nil))
+
+    shader))
+
+(defun load-shader-replace-type (gl type)
+  (if (stringp type)
+      (cond ((string= type :vertex-shader) (@gl *vertex_shader*))
+	    ((string= type :fragment-shader) (@gl *fragment_shader*))
+	    (t (error "wrong type in load-shader: " type)))
+      type))
+
+(defun load-shader (gl type src)
+  (setf type (load-shader-replace-type gl type))
+  (let ((shader (@gl create-shader type)))
+    (@gl shader-source shader src)
+    (@gl compile-shader shader)
+
+    (unless (@gl get-shader-parameter shader (@gl *compile_status*))
+      (alert (+ "error compiling shader: "
+		(chain gl (get-shader-info-log shader))))
+      (@gl delete-shader shader)
+      (return nil))
+
+    shader))
+
+(defun make-array-buffer (gl components)
+  (let ((buf (chain gl (create-buffer))))
+    (bind-buffer gl :array-buffer buf)
+    (@gl buffer-data (@gl *array_buffer*)
+	 (new (-float-32-array components))
+	 (@gl *static_draw*))
+    buf))
+
+(defun make-element-array-buffer (gl components)
+  (let ((buf (chain gl (create-buffer))))
+    (bind-buffer gl :element-array-buffer buf)
+    (@gl buffer-data (@gl *element_array_buffer*)
+	 (new (-uint-16-array components))
+	 (@gl *static_draw*))
+    buf))
+
+(defun compute-nvert-or-elem (gl pos-buf ebo)
+  "Compute the number of vertices or elements. It is the length of the
+  EBO, or the number of points if not defined"
+  (bind-buffer gl :array-buffer pos-buf)
+  (when ebo (bind-buffer gl :element-array-buffer ebo))
+  (if ebo
+      (/ (@gl get-buffer-parameter (@gl *element_array_buffer*)
+	      (@gl *buffer_size*))
+	 2) ;; bc 1 ushort of 2 bytes
+      (/ (@gl get-buffer-parameter (@gl *array_buffer*)
+	      (@gl *buffer_size*))
+	 (* 3 4)))) ;; bc 3 floats of 4 bytes
+
+(defun xor (a b)
+  (and (or a b) (not (and a b))))
+
+(defun make-render-obj (gl program pos-buf &key mode ebo normal color)
+  "By default, MODE is gl.TRIANGLE_STRIP. "
+  (unless mode (setf mode (@gl *triangle_strip*)))
+
+  (bind-buffer gl :array-buffer pos-buf)
+
+  (let ((obj (create program program position pos-buf
+		     nvert-or-elem (compute-nvert-or-elem gl pos-buf ebo)
+		     attributes (create pos (@gl get-attrib-location program "pos"))
+		     uniforms (create proj
+				      (@gl get-uniform-location program "proj")
+				      model
+				      (@gl get-uniform-location program "model"))
+		     mode mode
+		     ebo ebo
+		     normal normal
+		     color color)))
+    ;; add the attribute locations
+    (when normal (setf (@ obj attributes normal)
+		       (@gl get-attrib-location program "normal")))
+    (when color (setf (@ obj attributes color)
+		      (@gl get-attrib-location program "color")))
+
+    obj))
+
+(defun register-render-obj (render-objects obj)
+  (chain render-objects (push obj))
+  obj)
+
+(defun register-render-obj-list (render-objects objs)
+  (dolist (obj objs objs)
+    (chain render-objects (push obj))))
+
+(defun clear-render-objs (render-objects)
+  ;; TODO free everything
+  (setf (@ render-objects length) 0))
+
+(defun render (render-objects settings gl)
+  (chain render-objects
+	 (map (lambda (obj) (render-one settings gl obj)))))
+
+(defun enable-vertex-attrib (gl location buf &optional (size 3))
+  "For now not very flexible, will be modified if needed"
+  (bind-buffer gl :array-buffer buf)
+  (@gl vertex-attrib-pointer location
+       size (@gl *float*)
+       f 0 0)
+  (@gl enable-vertex-attrib-array location))
+
+(defun load-camera-uniforms (gl uniforms settings)
+  "Load proper 4x4 matrices into the uniforms MODEL and PROJ, given
+the move vector in CONTROLS. "
+  (@gl uniform-matrix-4fv (@ uniforms proj) f
+       (m4-transpose (m4-perspective 45 (/ 640 480) 0.1 100)))
+  (with-slots (camera-pos controls) settings
+    (@gl uniform-matrix-4fv (@ uniforms model) f
+	 (m4-transpose (m4-mul
+			(m4-translation (v3* -1 camera-pos))
+			(m4-rotationx (@ controls movey))
+			(m4-rotationy (@ controls movex)))))))
+
+(defun render-one (settings gl obj)
+  (let ((pos (@gl get-attrib-location (@ obj program) "pos"))
+	(nvert-or-elem (@ obj nvert-or-elem))
+	(ebo (@ obj ebo))
+	(mode (@ obj mode))
+	(normal (@ obj normal))
+	(color (@ obj color)))
+    (bind-buffer gl :array-buffer (@ obj position))
+    
+    (when ebo
+      (bind-buffer gl :element-array-buffer ebo))
+
+    ;; setup attributes
+    (enable-vertex-attrib gl (@ obj attributes pos) (@ obj position))
+    (when normal (enable-vertex-attrib gl (@ obj attributes normal) normal))
+    (when color (enable-vertex-attrib gl (@ obj attributes color) color))
+    
+    (@gl use-program (@ obj program))
+
+    (load-camera-uniforms gl (@ obj uniforms) settings)
+
+    (if ebo
+	(@gl draw-elements mode nvert-or-elem (@gl *unsigned_short*) 0)
+	(@gl draw-arrays mode 0 nvert-or-elem))))
+
+(defun inject-mouse-event-handling (canvas controls)
+  "Update controls.move[xy] when the mouse is moving on the canvas,
+  with a button pressed. "
+  (let (prev-x prev-y) ;; null is fine, as they are set before used
+    (labels ((mouse-move (e)
+	       (let ((dx (- (@ e client-x) prev-x))
+		     (dy (- (@ e client-y) prev-y)))
+		 (setf prev-x (@ e client-x))
+		 (setf prev-y (@ e client-y))
+
+		 (incf (@ controls movex) (/ dx 100))
+		 (incf (@ controls movey) (/ dy 100))))
+	     (mouse-down (e)
+	       (chain canvas (add-event-listener "mousemove" mouse-move))
+	       (chain canvas (add-event-listener "mouseup" mouse-up))
+	       
+	       (setf prev-x (@ e client-x))
+	       (setf prev-y (@ e client-y)))
+	     (mouse-up (e)
+	       (chain canvas (remove-event-listener "mousemove" mouse-move))
+	       (chain canvas (remove-event-listener "mouseup" mouse-up))))
+      
+      (chain canvas (add-event-listener "mousedown" mouse-down)))))
+
+(defun select-element (selector)
+  (let ((element (chain document (query-selector selector))))
+    (unless element (error "element not found: " selector))
+    element))
+
+(defun button-add-on-click (fun selector)
+  (chain (select-element selector) (add-event-listener "click" fun)))
+
+(defun reset-camera (settings)
+  (setf (@ settings controls movex) 0)
+  (setf (@ settings controls movey) 0))
+
+(defun valence-band-display-string (settings)
+  (if (@ settings valence-band)
+      "Hide valence band"
+      "Display valence band"))
+
+(defun toggle-valence-band-display (render-objects settings register-fun button)
+  (setf (@ settings valence-band)
+	(not (@ settings valence-band)))
+  (setf (@ button value) (valence-band-display-string settings))
+  ;; redraw everything
+  (clear-render-objs render-objects)
+  (register-fun))
+
+(defparameter π (@ -math *pi*))
+
+(defun reciprocal-lattice-2d (a1 a2)
+  (let ((det (- (* (@ a1 0) (@ a2 1))
+		(* (@ a1 1) (@ a2 0)))))
+    (values (v2* (* 2 π (/ 1 det)) (v2 (@ a2 1) (- (@ a2 0))))
+	    (v2* (* 2 π (/ 1 det)) (v2 (@ a1 1) (- (@ a1 0)))))))
+
+
+(defun make-bz-hexagon (gl &optional (shift (v3 0 0 0)))
+  (let* ((g (graphene-vectors))
+	 (coords (array (@ g k)
+			(v2+ (@ g k*) (@ g b1))
+			(v2+ (@ g k) (v2* -1 (@ g b2)))
+			(@ g kstar)
+			(v2+ (@ g k) (v2* -1 (@ g b1)))
+			(v2+ (@ g k*) (@ g b2)))))
+    ;; put a y=0 coord
+    (setf coords (chain coords (map (lambda (v2) (v3 (@ v2 0) 0 (@ v2 1))))))
+    ;; translate by SHIFT
+    (setf coords (chain coords (map (lambda (v3) (v3+ v3 shift)))))
+    
+    (make-render-obj gl
+		     (init-shader-program gl vs-src-3d
+					  (shader-src-constant-color 1 0 0))
+		     ;; need to flatten to go from a 6x2 to 12 dim array
+		     (make-array-buffer gl (flat coords))
+		     :mode (@gl *line_loop*))))
+
+(defun color-map (val min max)
+  "Returns a rgb vector. "
+  (setf val (/ (- (clamp val min max) min) (- max min)))
+  (if (> val 0.5)
+      (v3 0 (* 2 (- val 0.5)) (* 2 (- 1 val)))
+      (v3 0 (* 2 (- 0.5 val)) (* 2 val))))
+
+(defun height-map-make-color-buf (gl heights color-map)
+  "Helper function for MAKE-TRIANGLE-HEIGHTMAP"
+  (make-array-buffer gl (flat (mapcar color-map heights))))
+
+(defun height-map-make-vert-bufs (gl n a1 a2 height-fun y-scale origin shift)
+  "Helper function for MAKE-TRIANGLE-HEIGHTMAP. Difference between
+ORIGIN and SHIFT: SHIFT does not change the value of the heightmap. "
+  (let ((points ([]))
+	(normals ([]))
+	(heights ([]))
+	(points-idcs (array-of-arrays (1+ n))) ;; a 2D array
+	(nacc -1))
+    (dotimes (n1 (1+ n))
+      (dotimes (n2 (- n n1 -1)) ;; n1 + n2 <= n
+	(let ((pos (v3+ origin (v3* n1 a1) (v3* n2 a2))))
+	  (multiple-value-bind (height grad)
+	      (height-fun (@ pos 0) (@ pos 2))
+	    ;; rescale the heightmap
+	    (setf height (* y-scale height))
+	    (setf grad (v2* y-scale grad))
+	    
+	    (incf (aref pos 1) height)
+	    (setf (aref points (incf nacc)) (v3+ shift pos)) ;; set pos
+	    (setf (aref normals nacc) (v3-normalize (v3 (- (@ grad 0))
+							1
+							(- (@ grad 1))))) ;; and normal
+	     ;; save for later for the colors (remove the y-scale factor)
+	    (setf (aref heights nacc) (/ height y-scale))))
+	(setf (aref points-idcs n1 n2) nacc) ;; fill indices array
+	))
+    (values (make-array-buffer gl (flat points))
+	    (make-array-buffer gl (flat normals))
+	    heights points-idcs))) 
+
+(defun height-map-make-idcs (gl n points-idcs)
+  "Helper function for MAKE-TRIANGLE-HEIGHTMAP"
+  (let ((idcs ([]))
+	(nacc -1))
+    (dotimes (n2 n) ;; strip index
+      (dotimes (n1 (- n n2 1))
+	(setf (aref idcs (incf nacc)) (aref points-idcs n1 n2))
+	(setf (aref idcs (incf nacc)) (aref points-idcs (1+ n1) n2))
+	(setf (aref idcs (incf nacc)) (aref points-idcs n1 (1+ n2)))
+
+	(setf (aref idcs (incf nacc)) (aref points-idcs n1 (1+ n2)))
+	(setf (aref idcs (incf nacc)) (aref points-idcs (1+ n1) n2))
+	(setf (aref idcs (incf nacc)) (aref points-idcs (1+ n1) (1+ n2))))
+      ;; also the last triangle of the strip (the one not paired)
+      (setf (aref idcs (incf nacc)) (aref points-idcs (- n n2) n2))
+      (setf (aref idcs (incf nacc)) (aref points-idcs (- n n2 1) (1+ n2)))
+      (setf (aref idcs (incf nacc)) (aref points-idcs (- n n2 1) n2)))
+    (make-element-array-buffer gl idcs)))
+
+(defun make-triangle-heightmap (gl triangle-vertices niter
+				height-fun color-map
+				&key (y-scale 1) (origin (v3 0 0 0)))
+  "Construct a heightmap, dividing the triangle in NITER
+  iterations. "
+  (let* ((n (chain -math (pow 2 niter)))
+	 ;; reduced basis
+	 (a1red (v3/ (v3-sub (@ triangle-vertices 1) (@ triangle-vertices 0)) n))
+	 (a2red (v3/ (v3-sub (@ triangle-vertices 2) (@ triangle-vertices 0)) n))
+	 ;; TODO horrible hack: assume the maximum height is 
+	 (max-height ()))
+    ;; generate vertices (pos and normals)
+    (multiple-value-bind (points-buf normals-buf heights points-idcs)
+	(height-map-make-vert-bufs gl n a1red a2red height-fun y-scale
+				   (@ triangle-vertices 0) origin)
+      
+      (make-render-obj gl
+		       (init-shader-program gl vs-src-3d-normal-color
+					    fs-src-normal-varying-color)
+		       points-buf
+		       :ebo (height-map-make-idcs gl n points-idcs)
+		       :mode (@gl *triangles*)
+		       :normal normals-buf
+		       :color (height-map-make-color-buf gl heights color-map)))))
+
+(defun graphene-vectors ()
+  "Compute relevant vectors of the graphene BZ"
+  (let ((a1 (v2/ (v2 3 (sqrt 3)) 2))
+	(a2 (v2/ (v2 3 (- (sqrt 3))) 2)))
+    (multiple-value-bind (b1 b2) (reciprocal-lattice-2d a1 a2)
+      (let* ((k (v2/ (v2+ b1 b2) 3))
+	     (k* (v2/ (v2+ b1 b2) -3))
+	     (deltas (array (v2 1 0)
+			    (v2-sub (v2 1 0) a1)
+			    (v2-sub (v2 1 0) a2)))
+	     (delta2s (array a1
+			     (v2-sub a2 a1)
+			     (v2* -1 a2))))
+	(create-from-vars a1 a2 b1 b2 k k* deltas delta2s)))))
+
+(defparameter *graphene* (graphene-vectors))
+
+(defun make-triangles-bz ()
+  "all the 6 triangles that constitute the BZ"
+  (let* ((k (@ *graphene* k)) (k* (@ *graphene* k*))
+	 (b1 (@ *graphene* b1)) (b2 (@ *graphene* b2))
+	 (c0 (v2 0 0)))
+    (array (array k (v2+ k* b1) c0)
+	   (array (v2+ k* b1) (v2-sub k b2) c0)
+	   (array (v2-sub k b2) k* c0)
+	   (array k* (v2-sub k b1) c0)
+	   (array (v2-sub k b1) (v2+ k* b2) c0)
+	   (array (v2+ k* b2) k c0))))
+
+(defun make-triangles-k ()
+  "all the 10 triangles that are around K and K*+b1"
+  (let* ((k (@ *graphene* k)) (k* (@ *graphene* k*))
+	 (b1 (@ *graphene* b1)) (b2 (@ *graphene* b2))
+	 (c0 (v2 0 0)) (b1-b2 (v2-sub b1 b2)))
+    (array
+     ;; b2
+     (array b2 k (v2+ k* b2))
+     (array b2 (v2+ k* b1 b2) k)
+     ;; b1
+     (array b1 k (v2+ k* b1 b2))
+     (array b1 (v2+ k* b1) k)
+     (array b1 (v2+ k b1 (v2* -1 b2)) (v2+ k* b1))
+     ;; b1 - b2
+     (array b1-b2 (v2+ k* b1) (v2+ k b1 (v2* -1 b2)))
+     (array b1-b2 (v2-sub k b2) (v2+ k* b1))
+     ;; 0
+     (array c0 (v2+ k* b1) (v2-sub k b2))
+     (array c0 k (v2+ k* b1))
+     (array c0 (v2+ k* b2) k))))
+
+(defun add-y=0-coord (v2)
+  "converts a 2d vector (x z) to a 3d vector (x 0 z)"
+  (v3 (@ v2 0) 0 (@ v2 1)))
+
+(defun make-band-structure (gl niter triangles &key valence-band (y-scale 1)
+						 (origin (v3 0 0 0)))
+  "returns a list of render objects, one for each triangle of the BZ"
+  ;; TODO this is a ugly hack
+  ;; assume Γ is a band extremum
+  (let ((max-height (graphene-conduction-band 0 0)))
+    (labels ((map-add-y=0 (coords)
+	       (chain coords (map add-y=0-coord)))
+	     (color-map-partial-applied (h)
+	       (color-map h (- max-height) max-height)))
+      (if valence-band
+	  (concat (mapcar (lambda (coords)
+			    (make-triangle-heightmap gl (map-add-y=0 coords) niter
+						     graphene-conduction-band
+						     color-map-partial-applied
+						     :yscale y-scale
+						     :origin origin))
+			  triangles)
+		  (mapcar (lambda (coords)
+			    (make-triangle-heightmap gl (map-add-y=0 coords) niter
+						     graphene-valence-band
+						     color-map-partial-applied
+						     :yscale y-scale
+						     :origin origin))
+			  triangles))
+	  (mapcar (lambda (coords)
+		    (make-triangle-heightmap gl (map-add-y=0 coords) niter
+					     graphene-conduction-band
+					     color-map-partial-applied
+					     :yscale y-scale
+					     :origin origin))
+		  triangles)))))
+
+;; functions to compute band structure. When using multiple values,
+;; the first is the value, and the second the derivative
+
+(defmacro with-derivatives (clauses &body body)
+  (if (null clauses)
+      `(progn ,@body)
+      (let* ((first-clause (car clauses))
+	     (vars (list (first first-clause) (second first-clause)))
+	     (form (third first-clause)))
+	`(multiple-value-bind ,vars ,form
+	   (with-derivatives ,(cdr clauses) ,@body)))))
+
+(defmacro avalues (&rest values)
+  "Anaphoric version of VALUES. The first argument is bound to IT for
+  the other ones."
+  `(let ((it ,(first values)))
+     (values it ,@values)))
+
+(defun graphene-d1 (k)
+  (values (chain *graphene* deltas
+		 (map (lambda (delta) (cos (v2-dot k delta))))
+		 (reduce (lambda (x y) (+ x y))))
+	  (v2* -1
+	       (chain *graphene* deltas
+		      (map (lambda (delta) (v2* (sin (v2-dot k delta)) delta)))
+		      (reduce (lambda (u v) (v2+ u v)))))))
+
+(defun graphene-d2 (k)
+  (values (chain *graphene* deltas
+		 (map (lambda (delta) (sin (v2-dot k delta))))
+		 (reduce (lambda (x y) (+ x y))))
+	  (chain *graphene* deltas
+		 (map (lambda (delta) (v2* (cos (v2-dot k delta)) delta)))
+		 (reduce (lambda (u v) (v2+ u v))))))
+
+(defun graphene-d3 (k)
+  (with-slots (m haldane-t) *settings-common*
+    (+ m
+       (* haldane-t (chain *graphene* delta2s
+			   (map (lambda (delta2) (sin (v2-dot k delta2))))
+			   (reduce (lambda (x y) (+ x y))))))))
+
+(defun conduction-band-without-d3 (kx ky)
+  (let* ((k (v2 kx ky)))
+    (with-derivatives ((d1 dd1 (graphene-d1 k))
+		       (d2 dd2 (graphene-d2 k)))
+      (avalues (sqrt (+ (^2 d1) (^2 d2)))
+	       (v2* (/ 2 it)
+		    (v2+ (v2* d1 dd1)
+			 (v2* d2 dd2)))))))
+
+(defun graphene-conduction-band (kx ky)
+  (with-derivatives ((d3 dd3 (graphene-d3 (v2 kx ky)))
+		     (d dd (conduction-band-without-d3 kx ky)))
+    (values (+ d3 d) (+ dd3 dd))))
+
+(defun graphene-valence-band (kx ky)
+  (with-derivatives ((d3 dd3 (graphene-d3 (v2 kx ky)))
+		     (d dd (conduction-band-without-d3 kx ky)))
+    (values (- d3 d) (- dd3 dd))))
+
+;; main stuff
+
+;; common settings: mainly the hamiltonian
+(defparameter *settings-common* (create m 0
+					haldane-t 0))
+
+;; for the first figure: whole BZ
+(defparameter *render-bz* ([]))
+(defparameter *settings-bz* (create controls (create movex 0 movey 0)
+				    valence-band t
+				    camera-pos (v3 0 0 8)))
+
+(defun register-all-bz (render-objects settings gl)
+  ;; BZ
+  (register-render-obj render-objects (make-bz-hexagon gl))
+  ;; band structure
+  (register-render-obj-list
+   render-objects
+   (make-band-structure gl 4 (make-triangles-bz)
+			:valence-band (@ settings valence-band)
+			:y-scale 1)))
+
+(defun main-bz ()
+  (with-gl-context (gl canvas "#bz-canvas")
+    ;; add event listeners
+    (inject-mouse-event-handling canvas (@ *settings-bz* controls))
+    (button-add-on-click
+     (lambda () (reset-camera *settings-bz*))
+     "#display-form input[type=\"button\"][value=\"Reset camera\"]")
+    (button-add-on-click
+     (lambda (e) (toggle-valence-band-display
+		  *render-bz* *settings-bz*
+		  (lambda ()
+		    (register-all-bz *render-bz* *settings-bz* gl))
+		  (@ e target)))
+     "#display-form #valence-band")
+
+    (setf (@ *settings-bz* gl) gl) ;; needed for REGENERATE-EVERYTHING
+    
+    (@gl enable (@gl *depth_test*))
+
+    (register-all-bz *render-bz* *settings-bz* gl)
+
+    (labels ((render-fun (now)
+	       (clear-screen gl 1 1 1)
+	       
+	       (render *render-bz* *settings-bz* gl)
+	       (request-animation-frame render-fun)))
+      (request-animation-frame render-fun))))
+
+;; for the second figure: around K and K*
+(defparameter *render-k* ([]))
+(defparameter *settings-k* (create controls (create movex 0 movey 0)
+				   valence-band t
+				   camera-pos (v3 0 0 10)))
+
+(defun k-plot-origin ()
+  "computes the coords of the middle point between K and K*"
+  (with-slots (k k* b1) *graphene*
+    (add-y=0-coord (v3* 1/2 (v3+ k k* b1)))))
+
+(defun register-all-k (render-objects settings gl)
+  ;; BZ
+  (register-render-obj render-objects (make-bz-hexagon gl (v3* -1 (k-plot-origin))))
+  ;; band structure
+  (register-render-obj-list
+   render-objects
+   (make-band-structure gl 4 (make-triangles-k)
+			:valence-band (@ settings valence-band)
+			:y-scale 1
+			:origin (v3* -1 (k-plot-origin)))))
+
+(defun main-k ()
+  (with-gl-context (gl canvas "#k-canvas")
+    ;; add event listeners
+    (inject-mouse-event-handling canvas (@ *settings-k* controls))
+    (button-add-on-click
+     (lambda () (reset-camera *settings-k*))
+     "#display-form input[type=\"button\"][value=\"Reset camera\"]")
+    (button-add-on-click
+     (lambda (e) (toggle-valence-band-display
+		  *render-k* *settings-k*
+		  (lambda ()
+		    (register-all-k *render-k* *settings-k* gl))
+		  (@ e target)))
+     "#display-form #valence-band")
+
+    (setf (@ *settings-k* gl) gl) ;; needed for REGENERATE-EVERYTHING
+    
+    (@gl enable (@gl *depth_test*))
+
+    (register-all-k *render-k* *settings-k* gl)
+
+    (labels ((render-fun (now)
+	       (clear-screen gl 1 1 1)
+	       
+	       (render *render-k* *settings-k* gl)
+	       (request-animation-frame render-fun)))
+      (request-animation-frame render-fun))))
+
+(defun regenerate-everything ()
+  ;; BZ
+  (clear-render-objs *render-bz*)
+  (register-all-bz *render-bz* *settings-bz* (@ *settings-bz* gl))
+
+  ;; K
+  (clear-render-objs *render-k*)
+  (register-all-k *render-k* *settings-k* (@ *settings-k* gl)))
+
+;; Hamiltonian control stuff
+
+(defun hamiltonian-formula (mass-term? haldane-term?)
+  (let ((terms ([])))
+    (when mass-term? (chain terms (push "M")))
+    (when haldane-term?
+      (chain terms (push "2t_H \\sum_{\\delta'} \\sin(\\vec k \\cdot \\delta')")))
+    
+    ;; if no terms put zero
+    (when (= 0 (@ terms length) (chain terms (push "0"))))
+    
+    (+ "\\[
+      \\begin{align}
+      &amp; d_1(\\vec k) = \\sum_{\\vec \\delta} \\cos(\\vec k \\cdot \\vec \\delta) \\\\
+      &amp; d_2(\\vec k) = \\sum_{\\vec \\delta} \\sin(\\vec k \\cdot \\vec \\delta) \\\\
+      &amp; d_3(\\vec k) = "
+       (chain terms (join " + "))
+       " \\\\
+      \\end{align}
+      \\]")))
+
+(defun mass-term-range-label (value)
+  (+ "\\(M = " value " \\)"))
+
+(defun render-latex ()
+  (chain -math-jax (typeset)))
+
+(defun update-hamiltonian-formula ()
+  (let ((mass-box (select-element "#hamiltonian-control #mass-term"))
+	(haldane-box (select-element "#hamiltonian-control #haldane-term"))
+	(formula (select-element "#hamiltonian-formula"))))
+  (setf (@ formula inner-h-t-m-l) (hamiltonian-formula
+				   (@ mass-box checked)
+				   (@ haldane-box checked)))
+  (render-latex))
+
+(defun setup-mass-term ()
+  (let ((box (select-element "#hamiltonian-control #mass-term"))
+	(range (select-element "#hamiltonian-control #mass-term-range"))
+	(range-label (select-element "#hamiltonian-control #mass-term-range-label"))
+	(formula (select-element "#hamiltonian-formula")))
+    (labels ((on-box-change ()
+	       (if (@ box checked)
+		   (progn (setf (@ range hidden) f)
+			  (setf (@ range-label hidden) f))
+		   (progn (setf (@ range hidden) t)
+			  (setf (@ range-label hidden) t)
+			  ;; reset to 0 mass
+			  (setf (@ range value) "0")
+			  (on-range-change)))
+	       (update-hamiltonian-formula))
+	     
+	     (on-range-change ()
+	       (setf (@ range-label inner-h-t-m-l) (mass-term-range-label (@ range value)))
+	       (render-latex)
+	       (setf (@ *settings-common* m) (@ range value-as-number))
+	       (regenerate-everything)))
+      ;; run them once to sync everything
+      (on-box-change)
+      (on-range-change)
+      
+      (chain box (add-event-listener "change" on-box-change))
+      ;; use input because change triggers when mouse is released
+      (chain range (add-event-listener "input" on-range-change)))))
+
+(defun haldane-term-range-label (value)
+  (+ "\\(t_H = " value " \\)"))
+
+(defun setup-haldane-term ()
+  (let ((box (select-element "#hamiltonian-control #haldane-term"))
+	(range (select-element "#hamiltonian-control #haldane-term-range"))
+	(range-label (select-element "#hamiltonian-control #haldane-term-range-label"))
+	(formula (select-element "#hamiltonian-formula")))
+    (labels ((on-box-change ()
+	       (if (@ box checked)
+		   (progn (setf (@ range hidden) f)
+			  (setf (@ range-label hidden) f))
+		   (progn (setf (@ range hidden) t)
+			  (setf (@ range-label hidden) t)
+			  ;; reset to 0 Haldane hopping
+			  (setf (@ range value) "0")
+			  (on-range-change)))
+	       (update-hamiltonian-formula))
+	     
+	     (on-range-change ()
+	       (setf (@ range-label inner-h-t-m-l) (haldane-term-range-label (@ range value)))
+	       (render-latex)
+	       (setf (@ *settings-common* haldane-t) (@ range value-as-number))
+	       (regenerate-everything)))
+      ;; run them one to sync everything
+      (on-box-change)
+      (on-range-change)
+      
+      (chain box (add-event-listener "change" on-box-change))
+      ;; use input because change triggers when mouse is released
+      (chain range (add-event-listener "input" on-range-change)))))
+
+(defun hamiltonian-control-main ()
+  (setup-mass-term)
+  (setup-haldane-term))
+
+(window-on-load
+ (main-bz)
+ (main-k)
+ (hamiltonian-control-main))

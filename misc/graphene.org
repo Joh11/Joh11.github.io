@@ -1,0 +1,52 @@
+#+title: Graphene and Haldane model band structure
+
+#+begin_export html
+<!-- BZ -->
+<canvas id="bz-canvas" width="640" height="480"
+	style="border: 1px solid black;"></canvas>
+<!-- K and K* points only -->
+<canvas id="k-canvas" width="640" height="480"
+	style="border: 1px solid black;"></canvas>
+
+<form id="display-form">
+  <fieldset>
+    <legend>Display options</legend>
+    <input type="button" value="Reset camera">
+    <input type="button" id="valence-band" value="Hide valence band">
+  </fieldset>
+</form>
+
+\[
+\renewcommand{\vec}{\mathbf}
+\require{ams}
+\]
+
+\[H(\vec k) = d_1(\vec k) \sigma_1 + d_2(\vec k) \sigma_2 + d_3(\vec k) \sigma_3 \]
+
+<p id="hamiltonian-formula">
+  \[
+  \begin{align}
+  &amp; d_1(\vec k) = \sum_{\vec \delta} \cos(\vec k \cdot \vec \delta) \\
+  &amp; d_2(\vec k) = \sum_{\vec \delta} \sin(\vec k \cdot \vec \delta) \\
+  &amp; d_3(\vec k) = 0 \\
+  \end{align}
+  \]
+</p>
+
+<form id="hamiltonian-control">
+  <fieldset>
+    <legend>Hamiltonian options</legend>
+    <input type="checkbox" id="mass-term"><label for="mass-term">Mass term</label>
+    <input type="range" id="mass-term-range" min="0" max="3" step="0.2">
+    <label for="mass-term-range" id="mass-term-range-label"></label>
+
+    <input type="checkbox" id="haldane-term">
+    <label for="haldane-term">Haldane term</label>
+    <input type="range" id="haldane-term-range" min="-1" max="1" step="0.05">
+    <label for="haldane-term-range" id="haldane-term-range-label"></label>
+  </fieldset>
+</form>
+
+<script src="js/vecmath.js"></script>
+<script src="js/graphene.js"></script>
+#+end_export

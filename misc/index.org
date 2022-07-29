@@ -4,3 +4,7 @@ A collection of stuff.
 
 - [[file:bz.org][Brillouin zone visualization]]: a WebGL app to visualize the Brillouin
   zone for a given lattice, and play with it interactively
+- [[file:graphene.org][Graphene and Haldane model band structure]]: a WebGL app to visualize
+  the band structure of graphene. The Hamiltonian parameters can be
+  tweaked, especially one can add a Haldane term, to see how it breaks
+  the symmetries of the band structure. 

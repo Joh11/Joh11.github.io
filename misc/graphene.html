@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Johan Félisaz</title>
+<link rel="stylesheet" href="/global.css"><link rel="stylesheet" href="/custom.css"><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<header>
+<h1>Johan Félisaz</h1>
+<nav><ul>
+<li><a href="/index.html">Home</a></li>
+<li><a href="/projects.html">Projects</a></li>
+<li><a href="/notes.html">Notes</a></li>
+<li><a href="/misc/">Misc</a></li>
+<li><a href="/key.asc">GPG</a></li>
+</ul></nav>
+</header>
+<h2>Graphene and Haldane model band structure</h2>
+<p>
+<!-- BZ -->
+<canvas id="bz-canvas" width="640" height="480"
+	style="border: 1px solid black;"></canvas>
+<!-- K and K* points only -->
+<canvas id="k-canvas" width="640" height="480"
+	style="border: 1px solid black;"></canvas>
+</p>
+<p>
+<form id="display-form">
+  <fieldset>
+    <legend>Display options</legend>
+    <input type="button" value="Reset camera">
+    <input type="button" id="valence-band" value="Hide valence band">
+  </fieldset>
+</form>
+</p>
+<p>
+\[
+\renewcommand{\vec}{\mathbf}
+\require{ams}
+\]
+</p>
+<p>
+\[H(\vec k) = d_1(\vec k) \sigma_1 + d_2(\vec k) \sigma_2 + d_3(\vec k) \sigma_3 \]
+</p>
+<p>
+<p id="hamiltonian-formula">
+  \[
+  \begin{align}
+  &amp; d_1(\vec k) = \sum_{\vec \delta} \cos(\vec k \cdot \vec \delta) \\
+  &amp; d_2(\vec k) = \sum_{\vec \delta} \sin(\vec k \cdot \vec \delta) \\
+  &amp; d_3(\vec k) = 0 \\
+  \end{align}
+  \]
+</p>
+</p>
+<p>
+<form id="hamiltonian-control">
+  <fieldset>
+    <legend>Hamiltonian options</legend>
+    <input type="checkbox" id="mass-term"><label for="mass-term">Mass term</label>
+    <input type="range" id="mass-term-range" min="0" max="3" step="0.2">
+    <label for="mass-term-range" id="mass-term-range-label"></label>
+</p>
+<p>
+    <input type="checkbox" id="haldane-term">
+    <label for="haldane-term">Haldane term</label>
+    <input type="range" id="haldane-term-range" min="-1" max="1" step="0.05">
+    <label for="haldane-term-range" id="haldane-term-range-label"></label>
+  </fieldset>
+</form>
+</p>
+<p>
+<script src="js/vecmath.js"></script>
+<script src="js/graphene.js"></script>
+</p>
+<footer>
+&copy; Johan Félisaz 2022. Generated using a custom AWK <a href="/export.awk">script</a>
+</footer>
+</body>
+</html>
