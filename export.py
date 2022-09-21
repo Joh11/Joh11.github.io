@@ -3,7 +3,7 @@ import os
 
 # use python3 -m http.server to try it locally
 
-root_paths=['', 'misc/']
+root_paths=['', 'misc/', 'memo/']
 
 for root in root_paths:
     for path in os.listdir(None if root == '' else root):

@@ -1,0 +1,143 @@
+#+title: Dictionary
+#+startup: latexpreview
+
+#+begin_comment
+Simply write about every concept, sorted alphabetically.
+#+end_comment
+
+* <<<Burgers vector>>>
+Vector used to characterize a dislocation. Can be computed by defining
+a rectangle before dislocation, and dislocating ; the Burgers vector
+is defined as the vector needed to "close" the dislocated rectangle
+again.
+
+* <<<Creation and annihilation operators for the QHO>>>
+\begin{equation*}
+  \hat a = \sqrt{\frac{m\omega}{2\hbar}} \left(
+   \hat x +
+   \frac{i}{m \omega} \hat p
+  \right)
+\end{equation*}
+\begin{equation*}
+  \hat a^\dagger = \sqrt{\frac{m\omega}{2\hbar}} \left(
+   \hat x -
+   \frac{i}{m \omega} \hat p
+  \right)
+\end{equation*}
+
+See Quantum harmonic oscillator Hamiltonian for how the Hamiltonian is
+expressed with respect to these operators.
+
+* <<<Chalcogen>>>
+The chalcogens are the elements of the group (column) 16 of the
+periodic table. There are elements behaving similar to oxygen: oxygen,
+sulfur, selenium, tellurium, and polonium.
+
+* <<<DFT band structure>>>
+To be really clear: the band structure, as computed within DFT by VASP
+or Quantum Espresso, is not the /real/ band structure. It is the
+spectrum of the solution to the Kohn-Sham equations, so it is not the
+proper quasiparticle band structure.
+
+* <<<DFT+U>>> calculations
+An extension of the DFT method with a Hubbard term. Used when DFT is
+not sufficient for transition metals (d and f orbitals).
+
+* <<<DFT-Koopmans theorem>>>
+Really similar to the Koopmans theorem, which works for the
+Hartree-Fock approximation. It states the ionization energy is minus
+the Kohn-Sham eigenvalue of the highest occupied energy band.
+
+* <<<Electronic temperature>>>
+See smearing. 
+
+* <<<Exciton>>>
+A quasiparticle, a bound state of an electron and a hole in a
+material, kept together by the Coulomb force. This is of course a
+neutral quasiparticle.
+  
+* <<<Gaussian integral>>>
+\begin{equation*}
+  \int \dd x e^{-\frac{x^2}{2\sigma^2}} =
+  \sqrt{2\pi \sigma^2}
+\end{equation*}
+
+\begin{equation*}
+  \int \dd x x^2 e^{-\frac{x^2}{2\sigma^2}} =
+  \sigma^3 \sqrt{2\pi}
+\end{equation*}
+
+* <<<Hellman-Feynman theorem>>>
+\begin{equation*}
+  \frac{\dd E_\lambda}{\dd \lambda} = \left\langle \psi_\lambda \left|
+  \frac{\dd \hat H_\lambda}{\dd \lambda}
+  \right| \psi_\lambda \right\rangle
+\end{equation*}
+
+If \(|\psi_\lambda\rangle\) is an eigenstate of \(\hat H_\lambda\),
+i.e. \(\hat H_\lambda |\psi_\lambda \rangle = E_\lambda|\psi_\lambda
+\rangle\).
+
+* <<<<Monkhorst-Pack>>> \(k\) grid
+Grid to cover the Brillouin zone, different from the simplest grid
+(\(\Gamma\) centered):
+\begin{equation*}
+  \vec{k_n} = \frac{n + \frac{1 - N}{2}}{N} \vec b
+  \text{, for }n = 0, ..., N - 1
+\end{equation*}
+
+To note: for odd \(N\), it contains the \(\Gamma\) point, but not for
+even \(N\).
+
+According to VASP Wiki, calculations usually converge faster on
+Monkhorst-Pack grids than on \(\Gamma\) centered grid, however special
+care has to be given to make sure no symmetry is broken.
+
+* <<<Pulay forces>>>
+Non physical forces that emerge in the context of a self consistent
+field calculation (e.g. DFT or HF). To compute the derivative of the
+energy with respect to the atomic positions, the Hellman-Feynman
+theorem is used. However it only holds for a complete basis set. All
+basis sets are in reality not complete, usually with an energy
+cutoff. This means that the theorem is not exactly correct, giving
+birth to extra terms, that is, extra forces.
+
+These have the tendency to underestimate the equilibrium volume
+(because more forces).
+
+Their effect is reduced with a greater energy cutoff (hence a "more
+complete" basis set).
+  
+* <<<Quantum harmonic oscillator Hamiltonian>>>
+\begin{equation*}
+  \hat H = \frac{\hat p^2}{2m} + \frac12 m \omega^2 \hat x^2
+  = \hbar \omega \left( \hat a^\dagger \hat a + \frac12 \right)
+\end{equation*}
+
+* <<<Smearing>>> in DFT calculations
+Trick used to improve convergence for SCF calculations in metals and
+semimetals. At zero temperature, the occupation number is a sharp
+function of the energy (jumps from 1 or 2 to 0 above the Fermi
+level). Thus, it can be difficult to integrate properly. Smearing
+helps with that, smoothing out the occupation number, as if there was
+a nonzero temperature.
+
+In practise, the Fermi-Dirac is not used, but simpler approximations,
+like the gaussian method of smearing. A refinement called cold
+smearing, or Marzari-Vanderbilt smearing can be used.
+
+How to choose the smearing parameters ? A convergence test may be
+useful, but one can first simply use a gaussian smearing with
+=degauss=0.01=.
+
+* <<<Transition metal>>>
+A transition metal is an element that has a partially filled
+\(d\)-subshell.
+
+These are mostly the elements of the groups (columns) 3 to 11 in the
+periodic table, with exceptions.
+
+* <<<Transition metal dichalcogenide>>> (TMD)
+Materials of the form \(MX_2\), with \(M\) a transition metal element,
+and \(X\) a chalcogen. These are monolayers, where the \(M\) atom
+layer is sandwiched between two \(X\) atom layers.
