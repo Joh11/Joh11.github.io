@@ -67,6 +67,26 @@ neutral quasiparticle.
   \sigma^3 \sqrt{2\pi}
 \end{equation*}
 
+* <<<Gaussian smearing>>>
+See smearing for more general information.
+
+Many quantities can be computed as a sum over all occupied
+states. Then, the \(k\)-resolved density of state can be written as:
+\begin{equation*}
+  \text{DOS}(\vec k, \varepsilon) = \sum_{n, \varepsilon_{n\vec k} < E_F}
+  \delta(\varepsilon - \varepsilon_{n\vec k})
+\end{equation*}
+
+The gaussian smearing technique consists in broadening the delta
+function to a gaussian:
+\begin{equation*}
+  \delta(\varepsilon - \varepsilon_{n\vec k}) \longrightarrow
+  \frac{1}{\sqrt{2\pi \sigma^2}} e^{-\frac{(\varepsilon - \varepsilon_{n\vec k})^2}{2\sigma^2}}
+\end{equation*}
+
+The parameter \(\sigma\) corresponds to the =degauss= value in Quantum
+Espresso.
+
 * <<<Hellman-Feynman theorem>>>
 \begin{equation*}
   \frac{\dd E_\lambda}{\dd \lambda} = \left\langle \psi_\lambda \left|
@@ -78,7 +98,7 @@ If \(|\psi_\lambda\rangle\) is an eigenstate of \(\hat H_\lambda\),
 i.e. \(\hat H_\lambda |\psi_\lambda \rangle = E_\lambda|\psi_\lambda
 \rangle\).
 
-* <<<Monkhorst-Pack>>> \(k\) grid
+* <<<<Monkhorst-Pack>>> \(k\) grid
 Grid to cover the Brillouin zone, different from the simplest grid
 (\(\Gamma\) centered):
 \begin{equation*}
