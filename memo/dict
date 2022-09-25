@@ -98,7 +98,7 @@ If \(|\psi_\lambda\rangle\) is an eigenstate of \(\hat H_\lambda\),
 i.e. \(\hat H_\lambda |\psi_\lambda \rangle = E_\lambda|\psi_\lambda
 \rangle\).
 
-* <<<<Monkhorst-Pack>>> \(k\) grid
+* <<<Monkhorst-Pack>>> \(k\) grid
 Grid to cover the Brillouin zone, different from the simplest grid
 (\(\Gamma\) centered):
 \begin{equation*}
