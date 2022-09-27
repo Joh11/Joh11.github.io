@@ -5,6 +5,9 @@
 Simply write about every concept, sorted alphabetically.
 #+end_comment
 
+* <<<Bernal stacking>>>
+Same as AB stacking.
+  
 * <<<Burgers vector>>>
 Vector used to characterize a dislocation. Can be computed by defining
 a rectangle before dislocation, and dislocating ; the Burgers vector
@@ -48,6 +51,25 @@ Really similar to the Koopmans theorem, which works for the
 Hartree-Fock approximation. It states the ionization energy is minus
 the Kohn-Sham eigenvalue of the highest occupied energy band.
 
+* <<<Edwards-Wilkinson equation>>>
+Arises in the context of growing surfaces.
+
+\begin{equation*}
+\pdiff{h}{t} = \nu_0 + \nu \nabla^2 h + \eta
+\end{equation*}
+
+where \(h(\vec x, t)\) is the height of the surface at the position
+\(\vec x\), \(\nu_0\) is a constant growth term, \(\nu\) is a
+diffusion factor, and \(\eta\) is a random noise.
+
+For simplicity, \(\eta(\vec x, t)\) is usually taken as a white noise, that is:
+\begin{equation*}
+\langle\eta\rangle = 0
+\end{equation*}
+\begin{equation*}
+\langle\eta(t)\eta(t')\rangle = D \delta(t-t')
+\end{equation*}
+  
 * <<<Electronic temperature>>>
 See smearing. 
 
@@ -98,6 +120,21 @@ If \(|\psi_\lambda\rangle\) is an eigenstate of \(\hat H_\lambda\),
 i.e. \(\hat H_\lambda |\psi_\lambda \rangle = E_\lambda|\psi_\lambda
 \rangle\).
 
+* <<<Kardar-Parisi-Zhang equation>>>
+A nonlinear extension of the Edwards-Wilkinson equation. In order to
+take into account the fact that a tilted surface has more surface
+area, hence would grow faster, a nonlinear term \(\left(\nabla
+h\right)^2\).
+
+\begin{equation*}
+  \pdiff{h}{t} = \nu_0 + \nu \nabla^2 h
+  + \frac{\lambda}{2} \left(\nabla h \right)^2+ \eta
+\end{equation*}
+
+\(\lambda\) is a tunable parameter, set to 1 if the KPZ equation is
+derived from a tilted surface (then it is the first term in the
+expansion of a square root).
+  
 * <<<Monkhorst-Pack>>> \(k\) grid
 Grid to cover the Brillouin zone, different from the simplest grid
 (\(\Gamma\) centered):
@@ -161,3 +198,7 @@ periodic table, with exceptions.
 Materials of the form \(MX_2\), with \(M\) a transition metal element,
 and \(X\) a chalcogen. These are monolayers, where the \(M\) atom
 layer is sandwiched between two \(X\) atom layers.
+
+* <<<Zak phase>>>
+Berry phase picked up by a particle moving across the unit cell
+(i.e. following the first non trivial loop in the torus).
