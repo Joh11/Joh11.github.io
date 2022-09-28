@@ -3,6 +3,8 @@ window.MathJax = {
 	macros: {
 	    dd: '{\\rm d}',
 	    vec: ['{\\bf #1}', 1],
+	    diff: ['\frac{\dd #1}{\dd #2}', 2],
+	    pdiff: ['\frac{\partial #1}{\partial #2}', 2],
 	},
     }
 }
