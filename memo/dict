@@ -14,6 +14,23 @@ a rectangle before dislocation, and dislocating ; the Burgers vector
 is defined as the vector needed to "close" the dislocated rectangle
 again.
 
+* <<<Carrier mobility>>>
+When an external electric field \(E\) is applied on charged
+(pseudo)particles, they start moving with a certain drift velocity
+\(v_d\).
+
+These two quantities are proportional:
+\begin{equation*}
+v_d = \mu E
+\end{equation*}
+with \(\mu\) being the carrier mobility. Its units are \(cm^2/(V\
+s)\).
+
+* <<<Chalcogen>>>
+The chalcogens are the elements of the group (column) 16 of the
+periodic table. There are elements behaving similar to oxygen: oxygen,
+sulfur, selenium, tellurium, and polonium.
+
 * <<<Creation and annihilation operators for the QHO>>>
 \begin{equation*}
   \hat a = \sqrt{\frac{m\omega}{2\hbar}} \left(
@@ -30,12 +47,6 @@ again.
 
 See Quantum harmonic oscillator Hamiltonian for how the Hamiltonian is
 expressed with respect to these operators.
-
-* <<<Chalcogen>>>
-The chalcogens are the elements of the group (column) 16 of the
-periodic table. There are elements behaving similar to oxygen: oxygen,
-sulfur, selenium, tellurium, and polonium.
-
 * <<<DFT band structure>>>
 To be really clear: the band structure, as computed within DFT by VASP
 or Quantum Espresso, is not the /real/ band structure. It is the
@@ -77,7 +88,19 @@ See smearing.
 A quasiparticle, a bound state of an electron and a hole in a
 material, kept together by the Coulomb force. This is of course a
 neutral quasiparticle.
-  
+
+* <<<Fokker-Planck equation>>>
+A counterpart of the Langevin equation. For a white noise, it can be
+written as followed:
+\begin{equation*}
+  \pdiff{P}{t}(\{X_i\}, t) =
+  - \sum_i \partial_{X_i} \let(P(\{X_i\}, t) F(\{X_i\}, t)\right)
+  + \frac{D}{2} \sum_i \partial_{X_i}^2P(\{X_i\}, t)
+\end{equation*}
+
+In this equation, \(F\) is the function from the Langevin equation,
+and \(D\) is the diffusion coefficient of the white noise.
+
 * <<<Gaussian integral>>>
 \begin{equation*}
   \int \dd x e^{-\frac{x^2}{2\sigma^2}} =
@@ -150,6 +173,14 @@ According to VASP Wiki, calculations usually converge faster on
 Monkhorst-Pack grids than on \(\Gamma\) centered grid, however special
 care has to be given to make sure no symmetry is broken.
 
+* <<<Langevin equation>>>
+\begin{equation*}
+\pdiff{X_i}{t} = F[\{X_i\}] + \eta_i(t)
+\end{equation*}
+
+where there are \(n\) random variables \(\{X_i\}\), and
+\(\{\eta_i(t)\}\) are noises, usually white.
+
 * <<<Pulay forces>>>
 Non physical forces that emerge in the context of a self consistent
 field calculation (e.g. DFT or HF). To compute the derivative of the
@@ -187,6 +218,11 @@ How to choose the smearing parameters ? A convergence test may be
 useful, but one can first simply use a gaussian smearing with
 =degauss=0.01=.
 
+* <<<\(sp^n\) hybridation>>>
+The number \(n\) represents the number of \(p\) orbitals mixed to get
+the hybrid orbitals. As they are mixed with one \(s\) orbital, it
+means that there are \(n+1\) \(sp^n\) orbitals.
+  
 * <<<Transition metal>>>
 A transition metal is an element that has a partially filled
 \(d\)-subshell.
@@ -198,6 +234,32 @@ periodic table, with exceptions.
 Materials of the form \(MX_2\), with \(M\) a transition metal element,
 and \(X\) a chalcogen. These are monolayers, where the \(M\) atom
 layer is sandwiched between two \(X\) atom layers.
+
+* <<<Universal exponents for growing surfaces>>>
+\begin{equation*}
+x \rightarrow bx
+\end{equation*}
+\begin{equation*}
+t \rightarrow b^z t
+\end{equation*}
+\begin{equation*}
+\delta h \rightarrow b^\alpha \delta h
+\end{equation*}
+
+There is a fourth (redundant) exponent, \(\beta\), such that:
+\begin{equation*}
+z = \frac{\alpha}{\beta}
+\end{equation*}
+
+* <<<White noise>>>
+A distribution \(\eta(t)\) is called a white noise if it satifies the
+following conditions:
+\begin{equation*}
+\langle\eta(t)\rangle = 0
+\end{equation*}
+\begin{equation*}
+\langle\eta(t)\eta(t')\rangle = D \delta(t-t')
+\end{equation*}  
 
 * <<<Zak phase>>>
 Berry phase picked up by a particle moving across the unit cell
