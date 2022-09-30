@@ -278,6 +278,19 @@ Not sure how good this approximation is, because it does \(\sum_n
 \frac{a_n}{b_n} = \frac{\sum_n a_n}{\sum_n b_n} \) which is blatantly
 false.
 
+* <<<Van der Waals interaction in DFT>>>
+VdW interactions are long range, and coming purely from the electron
+electron interaction. Given the local, or semilocal nature of
+functionals (LDA, GGA), standard DFT is not good enough to describe
+it.
+
+There are three main ways to tackle this issue (from order of
+computational cost):
+- VdW dispersion (extra local terms in the functional)
+- non local VdW (extra local terms in the functional)
+- RPA, in the adiabatic connection fluctuation dissipation theorem
+  framework
+  
 * <<<White noise>>>
 A distribution \(\eta(t)\) is called a white noise if it satifies the
 following conditions:
