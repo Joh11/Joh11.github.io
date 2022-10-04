@@ -5,6 +5,39 @@
 Simply write about every concept, sorted alphabetically.
 #+end_comment
 
+* <<<Berry connection>>>
+Let's assume a quantum system has an hamiltonian \(H(\lambda)\), and
+we are slowly (adiabatically) following a path in \(\lambda\)
+space. If we define \(| u_{n \lambda} \rangle\) to be eigenstates of
+\(H(\lambda)\), then the Berry connection is defined as:
+
+\begin{equation*}
+  A_n(\lambda) =
+  i \langle u_{n \lambda} | \partial_\lambda u_{n \lambda} \rangle
+\end{equation*}
+
+This quantity is *not* gauge invariant, with a gauge trasformation:
+\begin{equation*}
+  | u_{n \lambda} \rangle \longrightarrow
+  e^{i \varphi(\lambda)} | u_{n \lambda} \rangle
+\end{equation*}
+
+* <<<Berry curvature>>>
+The Berry curvature in 3D is just the curl of the Berry connection:
+\begin{equation*}
+\vec\Omega = \vec \nabla \times \vec A
+\end{equation*}
+
+In other dimensions, it can be defined as an antisymmetric (real)
+tensor:
+\begin{equation*}
+\Omega_{\mu \nu} = \partial_\mu A_\nu - \partial_\nu A_\mu
+ = - 2 \text{Im} \langle \partial_\mu u | \partial_\nu u \rangle
+\end{equation*}
+
+Contrary to the Berry connection, this is however a gauge invariant
+quantity.
+
 * <<<Bernal stacking>>>
 Same as AB stacking.
   
@@ -292,7 +325,7 @@ computational cost):
   framework
   
 * <<<White noise>>>
-A distribution \(\eta(t)\) is called a white noise if it satifies the
+A distribution \(\eta(t)\) is called a white noise if it satisfies the
 following conditions:
 \begin{equation*}
 \langle\eta(t)\rangle = 0
