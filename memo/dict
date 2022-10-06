@@ -5,6 +5,14 @@
 Simply write about every concept, sorted alphabetically.
 #+end_comment
 
+* <<<Atomic limit>>>
+A system admitting a set of exponentially localized Wannier functions
+follows the atomic limit: it can be viewed like a set of atomic
+orbitals, but modified.
+
+There are two main classes of counter examples: topological insulators
+and obstructed atomic limit systems. 
+  
 * <<<Berry connection>>>
 Let's assume a quantum system has an hamiltonian \(H(\lambda)\), and
 we are slowly (adiabatically) following a path in \(\lambda\)
@@ -16,7 +24,7 @@ space. If we define \(| u_{n \lambda} \rangle\) to be eigenstates of
   i \langle u_{n \lambda} | \partial_\lambda u_{n \lambda} \rangle
 \end{equation*}
 
-This quantity is *not* gauge invariant, with a gauge trasformation:
+This quantity is *not* gauge invariant, with a gauge transformation:
 \begin{equation*}
   | u_{n \lambda} \rangle \longrightarrow
   e^{i \varphi(\lambda)} | u_{n \lambda} \rangle
@@ -214,6 +222,11 @@ care has to be given to make sure no symmetry is broken.
 where there are \(n\) random variables \(\{X_i\}\), and
 \(\{\eta_i(t)\}\) are noises, usually white.
 
+* <<<Obstructed atomic limit>>>
+When a system does not admit an atomic limit view, yet we find a set
+of localized Wannier functions. Their Wannier centers do not match
+with the atomic positions.
+  
 * <<<Pulay forces>>>
 Non physical forces that emerge in the context of a self consistent
 field calculation (e.g. DFT or HF). To compute the derivative of the
