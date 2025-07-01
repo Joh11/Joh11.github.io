@@ -1,0 +1,136 @@
+body {
+	margin: 0 auto;
+	max-width: 600px;
+	min-width: 0;
+	padding: 0 10px 25px;
+	font-family: "Lucida Console", Helvetica, Arial, sans-serif;
+	background-color: rgba(241, 204, 151, 0.62);
+}
+
+h1 {
+	text-align: center;
+	font-size: 40px;
+}
+
+h2 {
+	margin-top: 1em;
+	padding-top: 1em;
+	font-size: 32px;
+}
+
+body {
+	color: #444;
+}
+
+h1, h2, strong {
+	color: #8B4513;
+}
+
+blockquote {
+	color: #1d3557;
+	font-style: italic;
+}
+
+a {
+	color: #ffa64d;
+}
+
+header {
+	font-size: 22px;
+}
+
+article {
+	font-size: 16px;
+	margin-top: 100px;
+}
+
+h3 {
+	font-size: 24px;
+	font-weight: normal;
+}
+
+p {
+    font-size: 18px;
+    margin: 15px 0;
+    letter-spacing: 0.5px;
+    line-height: 1.7;
+}
+
+ul li {
+    margin-bottom: 15px; /* Adds 15px space between list items */
+}
+
+/*The header_container is the div that contain the header*/
+.header_container {
+	/*Display of the children*/
+	display: flex;
+	position: fixed;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	/*Positioning of the bar*/
+	min-height: 60px;
+	top: 0;
+	right: 0;
+	left: 0;
+	width: 100%;
+	background-color: #f6dfbe;
+}
+
+header {
+	justify-self: left;
+	margin-left: 20px;
+}
+
+nav {
+	font-size: 22px;
+	margin-right: 20px;
+	justify-self: flex-end;
+	letter-spacing: 1px;
+}
+
+nav a {
+	margin-left: 20px;
+    text-decoration: none;
+}
+
+/*Images */
+
+img {
+	border-radius: 0px;
+	max-width: 100%;
+	border: 0px solid #ddd;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 30px;
+}
+
+.thumbnail {
+	max-width: 200px;
+	max-height: 200px;
+}
+
+iframe {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top: 40px;
+	padding-bottom: 40px;
+}
+
+/*Line break */
+
+br {
+	content: "";
+	margin: 2em;
+	display: block;
+	font-size: 24%;
+}
+
+.project_item {
+	list-style: square;
+	padding-top: 20px;
+	font-size: 24px;
+}
+
